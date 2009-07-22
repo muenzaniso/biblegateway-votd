@@ -18,7 +18,7 @@ The plugin defaults to using the NIV translation. You can specify other translat
 
 == Installation ==
 
-1. Upload the `biblegateway-votd.php` file to the `/wp-content/plugins/` directory.
+1. Upload the `bible-votd.php` file to the `/wp-content/plugins/` directory.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
 3. Add the Bible VOTD widget to your sidebar.  Or,
 4. Put <strong>[bible-votd]</strong> in the page or post content where you want the verse to appear.
