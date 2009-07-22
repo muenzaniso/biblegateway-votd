@@ -43,6 +43,10 @@ The plugin defaults to using the NIV translation. You can specify other translat
 
 Yes. The initial default is the New International Version (#31); however, when you change the version in the widget sidebar, the selected translation now becomes the default used for the shortcode in pages and posts.
 
+== Screenshots ==
+
+* No screenshots available.
+
 == Changelog ==
 
 = 2.2 =
