@@ -6,25 +6,45 @@ Requires at least: 2.5
 Tested up to: 2.8.2
 Stable tag: 2.2
 
-Adds <a href="http://www.biblegateway.com/">BibleGateway.com</a>'s verse of the day as a sidebar widget, or on page or post.
+Adds BibleGateway.com's verse of the day as a sidebar widget, or on page or post.
 
 == Description ==
 
-Adds <a href="http://www.biblegateway.com/">BibleGateway.com</a>'s verse of the day as a sidebar widget.  This plugin will also allow you to include the verse of the day in a page or post using a shortcode: <em>[bible-votd]</em>. Different Bible translations can be selected from the widget's page or as options in the shortcode.
+Adds [BibleGateway.com](http://www.biblegateway.com/)'s verse of the day as a sidebar widget.  This plugin will also allow you to include the verse of the day in a page or post using a shortcode: `[bible-votd]`. Different Bible translations can be selected from the widget's page or as options in the shortcode.
 
 The plugin defaults to using the NIV translation. You can specify other translations in the widget settings or with the "ver" option in the shortcode. For example, to use the KJV in a page or post, write:
 
-<code>[bible-votd ver="9"]</code>
+`[bible-votd ver="9"]`
 
 == Installation ==
 
 1. Upload the `bible-votd.php` file to the `/wp-content/plugins/` directory.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
 3. Add the Bible VOTD widget to your sidebar.  Or,
-4. Put <strong>[bible-votd]</strong> in the page or post content where you want the verse to appear.
+4. Put `[bible-votd]` in the page or post content where you want the verse to appear.
 
 == Frequently Asked Questions ==
 
-== Screenshots ==
+= What are the version numbers for supported translations when including the verse in a page or post? =
 
-* No screenshots.
+* 8 = American Standard Version
+* 45 = Amplified Bible
+* 16 = Darby Translation
+* 47 = English Standard Version
+* 9 = King James Version
+* 49 = New American Standard Bible
+* 76 = New International Reader's Version
+* 31 = New International Version
+* 64 = New International Version - UK
+* 72 = Today's New International Version
+* 15 = Young's Literal Translation
+
+= Does changing the version in the widget affect the default version used in pages or posts? =
+
+Yes. The initial default is the New International Version (#31); however, when you change the version in the widget sidebar, the selected translation now becomes the default used for the shortcode in pages and posts.
+
+== Changelog ==
+
+= 2.2 =
+
+* First public release on the WordPress Plugins directory.

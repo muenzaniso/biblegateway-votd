@@ -1,7 +1,7 @@
 <?php 
 /*  
 Plugin Name: BibleGateway VOTD
-Plugin URI: http://www.zaikos.com/blog/wp-plugins/
+Plugin URI: http://www.zaikos.com/blog/wp-plugins/biblegateway-votd/
 Version: 2.2
 Author: <a href="http://www.zaikos.com/blog/">Dave Zaikos</a>
 Description: Insert <a href="http://www.biblegateway.com/usage/">BibleGateway.com</a>'s verse-of-the-day in pages or posts. Add <strong>[bible-votd]</strong> in pages or posts where you want to insert the verse.
