@@ -2,7 +2,7 @@
 Contributors: Dave Zaikos
 Donate link: http://www.zaikos.com/blog/#support-this-site
 Tags: bible, biblegateway, verse of the day, votd, niv, kjv
-Requires at least: 2.5
+Requires at least: 2.8
 Tested up to: 2.8.2
 Stable tag: 2.2
 
