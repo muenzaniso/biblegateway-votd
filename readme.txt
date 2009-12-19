@@ -3,7 +3,7 @@ Contributors: Dave Zaikos
 Donate link: http://www.zaikos.com/donate/
 Tags: bible, biblegateway, verse of the day, votd, niv, kjv
 Requires at least: 2.8
-Tested up to: 2.8.4
+Tested up to: 2.9
 Stable tag: 2.2
 
 Adds BibleGateway.com's verse of the day as a sidebar widget, or on page or post.
