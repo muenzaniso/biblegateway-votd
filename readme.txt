@@ -4,13 +4,13 @@ Donate link: http://www.zaikos.com/donate/
 Tags: bible, biblegateway, verse of the day, votd, niv, kjv
 Requires at least: 2.5
 Tested up to: 2.9.2
-Stable tag: 2.2
+Stable tag: 2.3
 
 Adds BibleGateway.com's verse of the day as a sidebar widget, or on page or post.
 
 == Description ==
 
-Adds [BibleGateway.com](http://www.biblegateway.com/)'s verse of the day as a sidebar widget.  This plugin will also allow you to include the verse of the day in a page or post using a shortcode: `[bible-votd]`. Different Bible translations can be selected from the widget's page or as options in the shortcode.
+Adds [BibleGateway.com](http://www.biblegateway.com/)'s verse of the day as a sidebar widget. This plugin will also allow you to include the verse of the day in a page or post using a shortcode: `[bible-votd]`. Different Bible translations can be selected from the widget's page or as options in the shortcode.
 
 The plugin defaults to using the NIV translation. You can specify other translations in the widget settings or with the "ver" option in the shortcode. For example, to use the KJV in a page or post, write:
 
@@ -19,11 +19,17 @@ The plugin defaults to using the NIV translation. You can specify other translat
 == Installation ==
 
 1. Upload the `bible-votd.php` file to the `/wp-content/plugins/` directory.
-2. Activate the plugin through the 'Plugins' menu in WordPress.
-3. Add the Bible VOTD widget to your sidebar.  Or,
-4. Put `[bible-votd]` in the page or post content where you want the verse to appear.
+2. Activate the plugin in the 'Plugins' page in WordPress.
+3. Add the BibleGateway VOTD widget to your sidebar. Or,
+4. Type `[bible-votd]` in the page or post content where you want the verse to appear.
 
 == Frequently Asked Questions ==
+
+= Why does using the plugin cause page load times to increase? =
+
+The plugin takes the JavaScript provided by BibleGateway.com for inserting the verse of the day and includes that when you use the widget or shortcode. If BibleGateway.com servers are running slow your visitor's web browser will wait for BibleGateway.com to respond with the verse (or timeout) before it finishes loading the page.
+
+This issue is common when inserting content from another site (e.g. BibleGateway.com, Twitter.com, etc.). You can work around the issue by placing the widget or shortcode as close the end of your page as possible.
 
 = What are the version numbers for supported translations when including the verse in a page or post? =
 
@@ -47,7 +53,8 @@ Yes. The initial default is the New International Version (#31); however, when y
 
 = 2.3 Beta =
 
-* Added compatibility for WordPress versions as early as 2.5.
+* Code optimizations.
+* Added compatibility for WordPress versions as early as 2.5 and ensured PHP 4 and 5 compatibility.
 
 = 2.2 =
 

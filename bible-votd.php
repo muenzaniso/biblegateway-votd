@@ -4,7 +4,7 @@ Plugin Name: BibleGateway VOTD
 Plugin URI: http://www.zaikos.com/coding/wp-plugins/biblegateway-votd/
 Version: 2.3
 Author: <a href="http://www.zaikos.com/">Dave Zaikos</a>
-Description: Insert <a href="http://www.biblegateway.com/usage/">BibleGateway.com</a>'s verse-of-the-day in pages or posts. Add <strong>[bible-votd]</strong> in pages or posts where you want to insert the verse.
+Description: Insert <a href="http://www.biblegateway.com/usage/">BibleGateway.com</a>'s verse-of-the-day in pages or posts. Use the Widgets page to add the verse to your sidebar or add <strong>[bible-votd]</strong> in pages or posts where you want to insert the verse.
 */
 
 /*  Copyright 2009-2010  Dave Zaikos  (email : http://www.zaikos.com/contact/)
@@ -64,7 +64,7 @@ if ( !class_exists( 'BibleGatewayVOTD_Plugin' ) ) {
 		}
 
 		function BibleGatewayVOTD_Plugin() {
-			__construct();
+			$this->__construct();
 		}
 
 		// Activation hook. Handles update from plugin versions earlier than 2.3.
@@ -73,18 +73,20 @@ if ( !class_exists( 'BibleGatewayVOTD_Plugin' ) ) {
 			if ( !get_option( 'dz_biblevotd' ) )
 				return;
 
-			$options = unserialize( get_option( 'dz_biblevotd' ) );
-			$options = array_merge( $this->get_defaults(), $options );
+			$options = maybe_unserialize( get_option( 'dz_biblevotd' ) );
+			$options = array_merge( $this->get_option_defaults(), (array)$options );
 
-			if ( add_option( 'biblegateway_votd', $options, '', 'yes' ) )
+			add_option( 'biblegateway_votd', $options, '', 'yes' );
+
+			if ( get_option( 'biblegateway_votd' ) === $options )
 				delete_option( 'dz_biblevotd' );
 		}
 
 		// Default options for the plugin.
 
-		function get_defaults() {
+		function get_option_defaults() {
 			$options = array(
-				'plugin_version' => 2.3,
+				'plugin_version' => '2.3',
 				'biblevotd-title' => 'Verse of the Day',
 				'ver' => 31
 				);
@@ -97,7 +99,7 @@ if ( !class_exists( 'BibleGatewayVOTD_Plugin' ) ) {
 			// Load default settings from the widget.
 
 			if ( !( $options = get_option( 'biblegateway_votd' ) ) )
-				$options = $this->get_defaults();
+				$options = $this->get_option_defaults();
 
 			// Get the Bible version and CSS class if specified.
 
@@ -125,11 +127,12 @@ if ( !class_exists( 'BibleGatewayVOTD_Plugin' ) ) {
 			// Load default settings from the widget.
 
 			if ( !( $options = get_option( 'biblegateway_votd' ) ) )
-				$options = $this->get_defaults();
+				$options = $this->get_option_defaults();
 
 			// The widget.
 
-			$votd = $before_widget;
+			$votd = '<!-- BibleGateway Verse-of-the-Day widget. http://www.zaikos.com/coding/wp-plugins/biblegateway-votd/ -->';
+			$votd .= $before_widget;
 			$votd .= $before_title . wptexturize( esc_attr( $options['biblevotd-title'] ) ) . $after_title;
 			$votd .= sprintf( $this->js_code, esc_attr( $options['ver'] ) );
 			$votd .= $after_widget;
@@ -144,9 +147,9 @@ if ( !class_exists( 'BibleGatewayVOTD_Plugin' ) ) {
 			// Load default settings for the widget.
 
 			if ( !( $options = get_option( 'biblegateway_votd' ) ) )
-				$options = $this->get_defaults();
+				$options = $this->get_option_defaults();
 
-			// Setup array of supported translations.
+			// Setup array of supported English translations. See http://www.biblegateway.com/usage/votd/custom_votd.php
 
 			$translations = array(
 				31 => "New International Version",
@@ -190,7 +193,7 @@ if ( !class_exists( 'BibleGatewayVOTD_Plugin' ) ) {
 			// The form.
 ?>
 <p>
-	<label for="biblevotd-title">Title:
+	<label for="biblevotd-title"><?php _e( 'Title' ); ?>:
 		<input class="widefat" name="biblegateway-votd-title" type="text" maxlength="50" value="<?php echo esc_attr( $options['biblevotd-title'] ); ?>">
 	</label>
 </p>
