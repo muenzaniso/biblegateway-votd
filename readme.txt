@@ -51,7 +51,7 @@ Yes. The initial default is the New International Version (#31); however, when y
 
 == Changelog ==
 
-= 2.3 Beta =
+= 2.3 =
 
 * Code optimizations.
 * Added compatibility for WordPress versions as early as 2.5 and ensured PHP 4 and 5 compatibility.
