@@ -3,7 +3,7 @@
 Plugin Name: BibleGateway VOTD
 Plugin URI: http://zaikos.com/biblegateway-votd/
 Description: Insert <a href="http://www.biblegateway.com/usage/">BibleGateway.com</a>'s verse-of-the-day in pages or posts. Use the Widgets page to add the verse to your sidebar or add <strong>[bible-votd]</strong> in pages or posts where you want to insert the verse.
-Version: 1.0
+Version: 3.0
 Author: Dave Zaikos
 Author URI: http://zaikos.com/
 License: GPL2
@@ -26,15 +26,128 @@ License: GPL2
 */
 
 if ( !class_exists( 'dz_biblegateway_votd' ) ) {
+	/**
+	 * dz_biblegateway_votd class.
+	 *
+	 * Insert BibleGateway.com's verse-of-the-day in pages, posts, or as a widget.
+	 *
+	 * @version 3.0
+	 * @author Dave Zaikos
+	 * @copyright Copyright (c) 2012, Dave Zaikos
+	 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
+	 */
 	class dz_biblegateway_votd {
 
-		function __construct() {
+		/**
+		 * __construct function.
+		 *
+		 * @since 1.0
+		 * @access public
+		 * @return void
+		 */
+		public function __construct() {
 //			add_action( '', array( &$this, '' ) );
 //			add_filter( '', array( &$this, '' ) );
 		}
 
-		function () {
+		/**
+		 * get_available_versions function.
+		 *
+		 * Returns an associative array of available BibleGateway
+		 * Bible translations/version.
+		 *
+		 * @since 3.0
+		 * @access public
+		 * @return array Associative array of available translations with keys of abbreviations and values of full names.
+		 */
+		public function get_available_versions() {
+			static $versions = array();
 
+			if ( empty( $versions ) ) {
+				$versions = array(
+					'KJ21' => '21st Century King James Version',
+					'ASV' => 'American Standard Version',
+					'AMP' => 'Amplified Bible',
+					'CEB' => 'Common English Bible',
+					'CEV' => 'Contemporary English Version',
+					'DARBY' => 'Darby Translation',
+					'DRA' => 'Douay-Rheims 1899 American Edition',
+					'ERV' => 'Easy-to-Read Version',
+					'ESV' => 'English Standard Version',
+					'ESVUK' => 'English Standard Version Anglicised',
+					'GW' => 'GOD’S WORD Translation',
+					'GNT' => 'Good News Translation',
+					'HCSB' => 'Holman Christian Standard Bible',
+					'PHILLIPS' => 'J.B. Phillips New Testament',
+					'KJV' => 'King James Version',
+					'LEB' => 'Lexham English Bible',
+					'MSG' => 'The Message',
+					'NASB' => 'New American Standard Bible',
+					'NCV' => 'New Century Version',
+					'NIRV' => 'New International Reader\'s Version',
+					'NIV' => 'New International Version',
+					'NIV1984' => 'New International Version 1984',
+					'NIVUK' => 'New International Version - UK',
+					'NKJV' => 'New King James Version',
+					'NLV' => 'New Life Version',
+					'NLT' => 'New Living Translation',
+					'TNIV' => 'Today\'s New International Version',
+					'WE' => 'Worldwide English (New Testament)',
+					'WYC' => 'Wycliffe Bible',
+					'YLT' => 'Young\'s Literal Translation'
+					);
+
+				$versions = (array) apply_filters( 'dz_biblegateway_versions', $versions );
+			}
+
+			return $versions;
+		}
+
+		/**
+		 * is_version_available function.
+		 *
+		 * Checks a bible version against the list of available versions.
+		 *
+		 * @access public
+		 * @uses self::get_available_versions()
+		 * @param string $version Version to check.
+		 * @return string|bool The abbreviation as a string if the version is available, otherwise false.
+		 */
+		public function is_version_available( $version ) {
+			$available = $this->get_available_versions();
+
+			// Check if it is an abbreviation.
+
+			$_version = strtoupper( $version );
+			if ( array_key_exists( $_version, $available ) )
+				return $_version;
+
+			// Check if it is a full name. If would have to be an exact match though.
+
+			if ( ( $_version = array_search( $version, $available ) ) )
+				return $available[$_version];
+
+			return false;
+		}
+
+		/**
+		 * print_basic_html_code function.
+		 *
+		 * Prints the basic BibleGateway.com HTML/JavaScript code.
+		 *
+		 * This should only ever be used as a last resort as it can significantly slow page loading.
+		 *
+		 * @todo Use self:is_version_available() to validate.
+		 * @access public
+		 * @param string $version (default: 'NIV')
+		 * @return void
+		 */
+		function print_basic_html_code( $version = 'NIV' ) {
+?>
+<script type="text/javascript" language="JavaScript" src="http://www.biblegateway.com/votd/votd.write.callback.js"></script>
+<script type="text/javascript" language="JavaScript" src="http://www.biblegateway.com/votd/get?format=json&amp;version=<?php echo esc_attr( $version ); ?>&amp;callback=BG.votdWriteCallback"></script>
+<noscript><iframe framespacing="0" frameborder="no" src="http://www.biblegateway.com/votd/get?format=html&amp;version=<?php echo esc_attr( $version ); ?>">View Verse of the Day</iframe></noscript>
+<?php
 		}
 
 	}

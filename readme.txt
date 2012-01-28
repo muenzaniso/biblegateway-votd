@@ -54,6 +54,9 @@ Yes. The initial default is the New International Version (#31); however, when y
 = 3.0 =
 
 * Complete rewrite.
+* Added internal documentation for clarity.
+* Added ability for themes or other plugins to modify available translations.
+* Added fallback option to display basic BibleGateway.com HTML/JavaScript code to insert the verse (basically what BibleGateway.com has on their web site). This is slower so it is not used by default.
 
 = 2.3 =
 
