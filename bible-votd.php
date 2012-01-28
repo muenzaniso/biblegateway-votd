@@ -142,7 +142,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * @param string $version (default: 'NIV')
 		 * @return void
 		 */
-		function print_basic_html_code( $version = 'NIV' ) {
+		public function print_basic_html_code( $version = 'NIV' ) {
 ?>
 <script type="text/javascript" language="JavaScript" src="http://www.biblegateway.com/votd/votd.write.callback.js"></script>
 <script type="text/javascript" language="JavaScript" src="http://www.biblegateway.com/votd/get?format=json&amp;version=<?php echo esc_attr( $version ); ?>&amp;callback=BG.votdWriteCallback"></script>
