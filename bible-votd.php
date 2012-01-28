@@ -53,8 +53,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		/**
 		 * get_available_versions function.
 		 *
-		 * Returns an associative array of available BibleGateway
-		 * Bible translations/version.
+		 * Returns an associative array of available BibleGateway Bible translations/version.
 		 *
 		 * @since 3.0
 		 * @access public
@@ -125,7 +124,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 			// Check if it is a full name. If would have to be an exact match though.
 
 			if ( ( $_version = array_search( $version, $available ) ) )
-				return $available[$_version];
+				return $_version;
 
 			return false;
 		}
