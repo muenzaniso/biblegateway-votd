@@ -1,9 +1,9 @@
 === Plugin Name ===
 Contributors: Dave Zaikos
-Donate link: http://www.zaikos.com/donate/
+Donate link: http://zaikos.com/donate/
 Tags: bible, biblegateway, verse of the day, votd, niv, kjv
 Requires at least: 2.5
-Tested up to: 2.9.2
+Tested up to: 3.3.1
 Stable tag: 2.3
 
 Adds BibleGateway.com's verse of the day as a sidebar widget, or on page or post.
@@ -50,6 +50,10 @@ This issue is common when inserting content from another site (e.g. BibleGateway
 Yes. The initial default is the New International Version (#31); however, when you change the version in the widget sidebar, the selected translation now becomes the default used for the shortcode in pages and posts.
 
 == Changelog ==
+
+= 3.0 =
+
+* Complete rewrite.
 
 = 2.3 =
 

@@ -1,18 +1,19 @@
 <?php
 /*
 Plugin Name: BibleGateway VOTD
-Plugin URI: http://www.zaikos.com/coding/wp-plugins/biblegateway-votd/
-Version: 2.3
-Author: <a href="http://www.zaikos.com/">Dave Zaikos</a>
+Plugin URI: http://zaikos.com/biblegateway-votd/
 Description: Insert <a href="http://www.biblegateway.com/usage/">BibleGateway.com</a>'s verse-of-the-day in pages or posts. Use the Widgets page to add the verse to your sidebar or add <strong>[bible-votd]</strong> in pages or posts where you want to insert the verse.
+Version: 1.0
+Author: Dave Zaikos
+Author URI: http://zaikos.com/
+License: GPL2
 */
 
-/*  Copyright 2009-2010  Dave Zaikos  (email : http://www.zaikos.com/contact/)
+/*  Copyright 2012  Dave Zaikos  (email : http://zaikos.com/contact/)
 
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+    it under the terms of the GNU General Public License, version 2, as
+    published by the Free Software Foundation.
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,6 +24,29 @@ Description: Insert <a href="http://www.biblegateway.com/usage/">BibleGateway.co
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
+if ( !class_exists( 'dz_biblegateway_votd' ) ) {
+	class dz_biblegateway_votd {
+
+		function __construct() {
+//			add_action( '', array( &$this, '' ) );
+//			add_filter( '', array( &$this, '' ) );
+		}
+
+		function () {
+
+		}
+
+	}
+
+	if ( !isset( $plugin_dz_biblegateway_votd ) )
+		$plugin_dz_biblegateway_votd = new dz_biblegateway_votd();
+}
+
+
+
+
+
 
 // Adds compatibility for < WP 2.8.
 
@@ -216,5 +240,5 @@ if ( !class_exists( 'BibleGatewayVOTD_Plugin' ) ) {
 
 // Initialize class.
 
-if ( class_exists( 'BibleGatewayVOTD_Plugin' ) || !isset( $bgvotd_plugin ) )
-	$bgvotd_plugin = new BibleGatewayVOTD_Plugin();
+//if ( class_exists( 'BibleGatewayVOTD_Plugin' ) || !isset( $bgvotd_plugin ) )
+//	$bgvotd_plugin = new BibleGatewayVOTD_Plugin();
