@@ -53,7 +53,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		/**
 		 * get_available_versions function.
 		 *
-		 * Returns an associative array of available BibleGateway Bible translations/version.
+		 * Returns an associative array of available BibleGateway Bible versions/translations.
 		 *
 		 * @since 3.0
 		 * @access public
@@ -74,7 +74,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 					'ERV' => 'Easy-to-Read Version',
 					'ESV' => 'English Standard Version',
 					'ESVUK' => 'English Standard Version Anglicised',
-					'GW' => 'GOD’S WORD Translation',
+					'GW' => 'GOD\'S WORD Translation',
 					'GNT' => 'Good News Translation',
 					'HCSB' => 'Holman Christian Standard Bible',
 					'PHILLIPS' => 'J.B. Phillips New Testament',
@@ -105,7 +105,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		/**
 		 * is_version_available function.
 		 *
-		 * Checks a bible version against the list of available versions.
+		 * Checks a Bible version against the list of available versions.
 		 *
 		 * @access public
 		 * @uses self::get_available_versions()
@@ -134,19 +134,20 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 *
 		 * Prints the basic BibleGateway.com HTML/JavaScript code.
 		 *
-		 * This should only ever be used as a last resort as it can significantly slow page loading.
+		 * This is the code BibleGateway.com provides but it should only ever be used as a last resort as it can significantly slow page loading.
 		 *
-		 * @todo Use self:is_version_available() to validate.
 		 * @access public
 		 * @param string $version (default: 'NIV')
 		 * @return void
 		 */
 		public function print_basic_html_code( $version = 'NIV' ) {
-?>
-<script type="text/javascript" language="JavaScript" src="http://www.biblegateway.com/votd/votd.write.callback.js"></script>
-<script type="text/javascript" language="JavaScript" src="http://www.biblegateway.com/votd/get?format=json&amp;version=<?php echo esc_attr( $version ); ?>&amp;callback=BG.votdWriteCallback"></script>
-<noscript><iframe framespacing="0" frameborder="no" src="http://www.biblegateway.com/votd/get?format=html&amp;version=<?php echo esc_attr( $version ); ?>">View Verse of the Day</iframe></noscript>
-<?php
+			if ( $version = is_version_available( $version ) ) {
+				printf( '<script type="text/javascript" language="JavaScript" src="http://www.biblegateway.com/votd/votd.write.callback.js"></script>
+<script type="text/javascript" language="JavaScript" src="http://www.biblegateway.com/votd/get?format=json&amp;version=%1$s&amp;callback=BG.votdWriteCallback"></script>
+<noscript><iframe framespacing="0" frameborder="no" src="http://www.biblegateway.com/votd/get?format=html&amp;version=%1$s">View Verse of the Day</iframe></noscript>
+',
+					esc_attr( $version ) );
+			}
 		}
 
 	}
