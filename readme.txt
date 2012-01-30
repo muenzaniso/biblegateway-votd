@@ -2,7 +2,7 @@
 Contributors: Dave Zaikos
 Donate link: http://zaikos.com/donate/
 Tags: bible, biblegateway, verse of the day, votd, niv, kjv
-Requires at least: 2.5
+Requires at least: 2.9
 Tested up to: 3.3.1
 Stable tag: 2.3
 
@@ -56,6 +56,7 @@ Yes. The initial default is the New International Version (#31); however, when y
 * Complete rewrite.
 * Added internal documentation for clarity.
 * Added ability for themes or other plugins to modify available translations.
+* Added ability for themes or other plugins to modify the final output for the verse.
 * Added fallback option to display basic BibleGateway.com HTML/JavaScript code to insert the verse (basically what BibleGateway.com has on their web site). This is slower so it is not used by default.
 
 = 2.3 =
