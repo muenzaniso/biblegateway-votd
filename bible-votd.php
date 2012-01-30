@@ -258,7 +258,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		}
 
 		/**
-		 * bible_votd_helper function.
+		 * bible_votd_code_helper function.
 		 *
 		 * Determines the method of adding the verse of the day and returns the necessary
 		 * code for the calling function to use.
@@ -266,7 +266,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * @access private
 		 * @return string The sprintf-ready code to be inserted into the page.
 		 */
-		private function bible_votd_helper() {
+		private function bible_votd_code_helper() {
 
 
 		}
@@ -296,8 +296,8 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 
 			// Build the code.
 
-			$votd = $this->bible_votd_helper();
-			$votd = sprintf( '<div id="biblevotd-%3$d" class="%2$s">' . $votd . "</div>\n" , $version, $class, $instance );
+			$code = $this->bible_votd_code_helper();
+			$votd = sprintf( '<div id="biblevotd-%3$d" class="%2$s">' . $code . "</div>\n" , $version, $class, $instance );
 
 			// Allow other plugins and themes to filter the final.
 
