@@ -77,10 +77,10 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * __construct function.
 		 *
 		 * @since 3.0
-		 * @access private
+		 * @access public
 		 * @return void
 		 */
-		private function __construct() {
+		public function __construct() {
 //			add_action( '', array( &$this, '' ) );
 //			add_filter( '', array( &$this, '' ) );
 			add_shortcode( 'biblevotd', array( &$this, 'bible_votd_shortcode' ) );
@@ -107,7 +107,6 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 					return 'NIV';
 			}
 
-
 			return false;
 		}
 
@@ -121,6 +120,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 *
 		 * @access private
 		 * @see self::get()
+		 * @uses get_option()
 		 * @uses update_option()
 		 * @param mixed $option
 		 * @return bool False if value was not updated and true if value was updated.
@@ -134,31 +134,11 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		}
 
 		/**
-		 * new_instance function.
-		 *
-		 * Keeps track of the number of times a verse has been inserted in a page and each instances
-		 * corresponding version.
-		 *
-		 * @access public
-		 * @static
-		 * @param mixed $version A valid Bible version.
-		 * @return int|bool The numeric instance of the inserted version. False if the passed version is not valid.
-		 */
-		static public function new_instance( $version ) {
-			if ( $_version = $this->is_version_available( $version ) ) {
-				$this->instances[] = $_version;
-				end( $this->instances );
-				return key( $this->instances );
-			}
-
-			return false;
-		}
-
-		/**
 		 * get_available_versions function.
 		 *
 		 * Returns an associative array of available BibleGateway Bible versions/translations.
 		 *
+		 * @todo Soft-code ability to augment this list.
 		 * @since 3.0
 		 * @access public
 		 * @static
@@ -236,25 +216,24 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		}
 
 		/**
-		 * print_basic_html_code function.
+		 * get_basic_html_code function.
 		 *
-		 * Prints the basic BibleGateway.com HTML/JavaScript code.
+		 * Returns the basic BibleGateway.com HTML/JavaScript code in a sprintf-ready format.
+		 * The sprintf call should use %1$s for the version.
 		 *
 		 * This is the code BibleGateway.com provides but it should only ever be used as a last
 		 * resort as it can significantly slow page loading.
 		 *
-		 * @access public
-		 * @param string $version (default: 'NIV')
-		 * @return void
+		 * @access private
+		 * @return string The HTML code to insert the verse.
 		 */
-		public function print_basic_html_code( $version = 'NIV' ) {
-			if ( $version = $this->is_version_available( $version ) ) {
-				printf( '<script type="text/javascript" language="JavaScript" src="http://www.biblegateway.com/votd/votd.write.callback.js"></script>
+		private function get_basic_html_code() {
+			$code = '<script type="text/javascript" language="JavaScript" src="http://www.biblegateway.com/votd/votd.write.callback.js"></script>
 <script type="text/javascript" language="JavaScript" src="http://www.biblegateway.com/votd/get?format=json&amp;version=%1$s&amp;callback=BG.votdWriteCallback"></script>
 <noscript><iframe framespacing="0" frameborder="no" src="http://www.biblegateway.com/votd/get?format=html&amp;version=%1$s">View Verse of the Day</iframe></noscript>
-',
-					esc_attr( $version ) );
-			}
+';
+
+			return $code;
 		}
 
 		/**
@@ -267,8 +246,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * @return string The sprintf-ready code to be inserted into the page.
 		 */
 		private function bible_votd_code_helper() {
-
-
+			return $this->get_basic_html_code();
 		}
 
 		/**
@@ -294,18 +272,27 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 
 			$class = implode( ' ', array_map( 'sanitize_html_class', explode( ' ', $class ) ) );
 
+			// Get and update instance.
+
+			$this->instance[] = $version;
+			end( $this->instance );
+			$instance = key( $this->instance );
+
 			// Build the code.
 
-			$code = $this->bible_votd_code_helper();
-			$votd = sprintf( '<div id="biblevotd-%3$d" class="%2$s">' . $code . "</div>\n" , $version, $class, $instance );
+			$votd = "\n<!-- BibleGateway.com Verse of the Day plugin by Dave Zaikos (http://zaikos.com/biblegateway-votd/). -->\n"; /* Luke 6:31. Please do not remove the credit. */
+			$votd .= "<div id='biblevotd-%3\$d' class='%2\$s'>\n";
+			$votd .= $this->bible_votd_code_helper();
+			$votd .= "</div>\n";
 
-			// Allow other plugins and themes to filter the final.
+			$votd = sprintf( $votd, $version, $class, $instance );
 
-			$votd = apply_filters( 'dz_biblegateway_versions', $votd, $version, $class, $instance );
+			// Allow other plugins and themes to filter the final verse.
+
+			$votd = apply_filters( 'pre_dz_biblegateway_verse', $votd, $version, $class, $instance );
 
 			return $votd;
 		}
-
 
 	}
 
@@ -450,12 +437,13 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		$plugin_dz_biblegateway_votd = new dz_biblegateway_votd();
 		add_action( 'widgets_init', create_function( '', 'register_widget( "dz_biblegateway_votd_widget" );' ) );
 	}
+
+	if ( is_admin() )
+		include plugin_dir_path( __FILE__ ) . 'bible-votd-admin.php';
 }
 
 
-/**
- * Old code begins here.
- */
+/* !Legacy code begins here. */
 
 // Adds compatibility for < WP 2.8.
 
