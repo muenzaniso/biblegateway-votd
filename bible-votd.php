@@ -47,21 +47,111 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * (default value: array())
 		 *
 		 * @var array
-		 * @access public
+		 * @access private
 		 * @static
 		 */
-		static public $instances = array();
+		static private $instances = array();
+
+		/**
+		 * option_name
+		 *
+		 * The option name for the WordPress options table.
+		 *
+		 * @see get_option()
+		 * @see update_option()
+		 */
+		const option_name = 'dz_biblegateway_votd';
+
+		/**
+		 * transient_name
+		 *
+		 * The name for the transient entry in the WordPress database. Uses the Transient API
+		 * to cache remotely fetched verses.
+		 *
+		 * @see get_transient()
+		 * @see set_transient()
+		 */
+		const transient_name = 'dz_biblegateway_votd_cache';
 
 		/**
 		 * __construct function.
 		 *
-		 * @since 1.0
-		 * @access public
+		 * @since 3.0
+		 * @access private
 		 * @return void
 		 */
-		public function __construct() {
+		private function __construct() {
 //			add_action( '', array( &$this, '' ) );
 //			add_filter( '', array( &$this, '' ) );
+			add_shortcode( 'biblevotd', array( &$this, 'bible_votd_shortcode' ) );
+		}
+
+		/**
+		 * get function.
+		 *
+		 * Retrieves from the WordPress options table for this plugin the specific option value, or its default value.
+		 *
+		 * @access private
+		 * @uses get_option()
+		 * @param string $var
+		 * @param bool $default (default: false)
+		 * @return mixed The value of the specified option or false if nothing was found.
+		 */
+		private function get( $var, $default = false ) {
+			$options = (array) get_option( self::option_name, array() );
+			if ( isset( $options[$var] ) && !$default )
+				return $options[$var];
+
+			switch( $var ) {
+				case 'default-version':
+					return 'NIV';
+			}
+
+
+			return false;
+		}
+
+		/**
+		 * set function.
+		 *
+		 * Updates the specific option for this plugin in the WordPress options table.
+		 *
+		 * This function, along with self::get(), wrap options in an array so the plugin only uses one
+		 * row in the database table (i.e. neat and tidy).
+		 *
+		 * @access private
+		 * @see self::get()
+		 * @uses update_option()
+		 * @param mixed $option
+		 * @return bool False if value was not updated and true if value was updated.
+		 */
+		private function set( $var, $value ) {
+			$options = (array) get_option( self::option_name, array() );
+
+			$options[$var] = $value;
+
+			return update_option( self::option_name, $options );
+		}
+
+		/**
+		 * new_instance function.
+		 *
+		 * Keeps track of the number of times a verse has been inserted in a page and each instances
+		 * corresponding version.
+		 *
+		 * @access public
+		 * @static
+		 * @param mixed $version A valid Bible version.
+		 * @return int|bool The numeric instance of the inserted version. False if the passed version is not valid.
+		 */
+		static public function new_instance( $version ) {
+			if ( $_version = $this->is_version_available( $version ) ) {
+				$this->instances[] = $_version;
+				end( $this->instances );
+				return key( $this->instances );
+			}
+
+			return false;
 		}
 
 		/**
@@ -71,9 +161,10 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 *
 		 * @since 3.0
 		 * @access public
+		 * @static
 		 * @return array Associative array of available translations with keys of abbreviations and values of full names.
 		 */
-		public function get_available_versions() {
+		static public function get_available_versions() {
 			static $versions = array();
 
 			if ( empty( $versions ) ) {
@@ -122,11 +213,12 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * Checks a Bible version against the list of available versions.
 		 *
 		 * @access public
+		 * @static
 		 * @uses self::get_available_versions()
 		 * @param string $version Version to check.
 		 * @return string|bool The abbreviation as a string if the version is available, otherwise false.
 		 */
-		public function is_version_available( $version ) {
+		static public function is_version_available( $version ) {
 			$available = $this->get_available_versions();
 
 			// Check if it is an abbreviation.
@@ -148,14 +240,15 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 *
 		 * Prints the basic BibleGateway.com HTML/JavaScript code.
 		 *
-		 * This is the code BibleGateway.com provides but it should only ever be used as a last resort as it can significantly slow page loading.
+		 * This is the code BibleGateway.com provides but it should only ever be used as a last
+		 * resort as it can significantly slow page loading.
 		 *
 		 * @access public
 		 * @param string $version (default: 'NIV')
 		 * @return void
 		 */
 		public function print_basic_html_code( $version = 'NIV' ) {
-			if ( $version = is_version_available( $version ) ) {
+			if ( $version = $this->is_version_available( $version ) ) {
 				printf( '<script type="text/javascript" language="JavaScript" src="http://www.biblegateway.com/votd/votd.write.callback.js"></script>
 <script type="text/javascript" language="JavaScript" src="http://www.biblegateway.com/votd/get?format=json&amp;version=%1$s&amp;callback=BG.votdWriteCallback"></script>
 <noscript><iframe framespacing="0" frameborder="no" src="http://www.biblegateway.com/votd/get?format=html&amp;version=%1$s">View Verse of the Day</iframe></noscript>
@@ -163,6 +256,56 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 					esc_attr( $version ) );
 			}
 		}
+
+		/**
+		 * bible_votd_helper function.
+		 *
+		 * Determines the method of adding the verse of the day and returns the necessary
+		 * code for the calling function to use.
+		 *
+		 * @access private
+		 * @return string The sprintf-ready code to be inserted into the page.
+		 */
+		private function bible_votd_helper() {
+
+
+		}
+
+		/**
+		 * bible_votd_shortcode function.
+		 *
+		 * The function handler for WordPress's shortcode API. This does the work of inserting
+		 * the verse of the day in a page or post.
+		 *
+		 * @access private
+		 * @param mixed $atts
+		 * @return string The Bible verse of the day.
+		 */
+		private function bible_votd_shortcode( $atts ) {
+			extract( shortcode_atts( array(
+				'version' => null,
+				'class' => 'biblevotd'
+				), $atts ) );
+
+			// Validate user-provided values.
+
+			if ( !$this->is_version_available( $version ) )
+				$version = $this->get( 'default-version' );
+
+			$class = implode( ' ', array_map( 'sanitize_html_class', explode( ' ', $class ) ) );
+
+			// Build the code.
+
+			$votd = $this->bible_votd_helper();
+			$votd = sprintf( '<div id="biblevotd-%3$d" class="%2$s">' . $votd . "</div>\n" , $version, $class, $instance );
+
+			// Allow other plugins and themes to filter the final.
+
+			$votd = apply_filters( 'dz_biblegateway_versions', $votd, $version, $class, $instance );
+
+			return $votd;
+		}
+
 
 	}
 
