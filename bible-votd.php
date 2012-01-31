@@ -138,10 +138,10 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 *
 		 * Returns an associative array of available BibleGateway Bible versions/translations.
 		 *
-		 * @todo Soft-code ability to augment this list.
 		 * @since 3.0
 		 * @access public
 		 * @static
+		 * @uses get_option()
 		 * @return array Associative array of available translations with keys of abbreviations and values of full names.
 		 */
 		static public function get_available_versions() {
@@ -181,6 +181,14 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 					'YLT' => 'Young\'s Literal Translation'
 					);
 
+				// Add user-defined translations.
+
+				$options = get_option( self::option_name );
+				if ( !empty( $options['extra-versions'] ) )
+					$versions = array_merge( $versions, $options['extra-versions'] );
+
+				// Filter the list so final changes can be forced.
+
 				$versions = (array) apply_filters( 'dz_biblegateway_versions', $versions );
 			}
 
@@ -199,7 +207,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * @return string|bool The abbreviation as a string if the version is available, otherwise false.
 		 */
 		static public function is_version_available( $version ) {
-			$available = $this->get_available_versions();
+			$available = self::get_available_versions();
 
 			// Check if it is an abbreviation.
 
@@ -255,11 +263,11 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * The function handler for WordPress's shortcode API. This does the work of inserting
 		 * the verse of the day in a page or post.
 		 *
-		 * @access private
+		 * @access public
 		 * @param mixed $atts
 		 * @return string The Bible verse of the day.
 		 */
-		private function bible_votd_shortcode( $atts ) {
+		public function bible_votd_shortcode( $atts ) {
 			extract( shortcode_atts( array(
 				'version' => null,
 				'class' => 'biblevotd'
@@ -280,7 +288,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 
 			// Build the code.
 
-			$votd = "\n<!-- BibleGateway.com Verse of the Day plugin by Dave Zaikos (http://zaikos.com/biblegateway-votd/). -->\n"; /* Luke 6:31. Please do not remove the credit. */
+			$votd = "\n<!-- BibleGateway.com Verse of the Day plugin by Dave Zaikos (http://zaikos.com/biblegateway-votd/). -->\n"; /* Luke 6:31. Please do not remove the credit. Thank you! */
 			$votd .= "<div id='biblevotd-%3\$d' class='%2\$s'>\n";
 			$votd .= $this->bible_votd_code_helper();
 			$votd .= "</div>\n";
