@@ -60,8 +60,8 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		}
 
 		function setting_validation_default_version( $input ) {
-			if ( dz_biblegateway_votd::is_version_available( $input ) )
-				return $input;
+			if ( $valid = dz_biblegateway_votd::is_version_available( $input ) )
+				return $valid;
 
 			return 'NIV';
 		}
