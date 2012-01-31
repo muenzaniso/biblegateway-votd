@@ -74,7 +74,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 <select name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[default-version]' ); ?>">
 <?php
 			foreach( $versions as $abbr => $desc ) {
-				$selected = selected( $version, $default );
+				$selected = selected( $abbr, $default, false );
 				printf ( "\t<option value='%1\$s'%2\$s>%3\$s</option>\n", esc_attr( $abbr ), $selected, esc_attr( $desc ) );
 			}
 ?>
