@@ -12,14 +12,18 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		}
 
 		public function settings_init() {
-			register_setting( 'dz_biblevotd_options', dz_biblegateway_votd::option_name, array( &$this, 'setting_validation_options' ) );
+			register_setting( 'dz_biblevotd_options', dz_biblegateway_votd::option_name, array( &$this, 'settings_validation' ) );
 
-			// General options.
-			
 			add_settings_section( 'biblevotd_options_general', 'General', create_function( '', '' ), 'dz_biblevotd_options_sections' );
 			add_settings_field( dz_biblegateway_votd::option_name . '[default-version]', 'Default Version', array( &$this, 'setting_field_default_version' ), 'dz_biblevotd_options_sections', 'biblevotd_options_general' );
 
-			// Reading options.
+			add_settings_section( 'biblevotd_options_advance', 'Advance', create_function( '', '' ), 'dz_biblevotd_options_sections' );
+			add_settings_field( dz_biblegateway_votd::option_name . '[extra-versions]', 'Additional Versions', array( &$this, 'setting_field_extra_versions' ), 'dz_biblevotd_options_sections', 'biblevotd_options_advance', array( 'label_for' => 'extra_versions' ) );
+
+
+
+
+			// Advanced options.
 
 			register_setting( 'biblevotd_options', '_theme_use_excerpt', array( &$this, 'setting_validation__theme_use_excerpt' ) );
 			add_settings_section( 'biblevotd_options_reading', __( 'Reading' ), create_function( '', '' ), 'biblevotd_options_sections' );
@@ -42,7 +46,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 <?php screen_icon(); ?>
 	<h2>Bible Verse of the Day Settings</h2>
 
-	<p>The BibleGateway.com plugin is in independently written and maintained by <a href="http://zaikos.com/">Dave Zaikos</a> and is in no way affiliated with BibleGateway.com.</p>
+	<p>The BibleGateway.com plugin is independently written and maintained by <a href="http://zaikos.com/">Dave Zaikos</a> and in no way affiliated with BibleGateway.com.</p>
 	<p>If you use this plugin, please consider <a href="http://zaikos.com/donate/">making a donation</a> to support its continued development. Donations from users such as yourself help ensure this software&#8217;s future.</p>
 
 	<form action="options.php" method="post">
@@ -59,17 +63,58 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 <?php
 		}
 
-		function setting_validation_default_version( $input ) {
-			if ( $valid = dz_biblegateway_votd::is_version_available( $input ) )
-				return $valid;
+		function settings_validation( $input ) {
 
-			return 'NIV';
+			// Get existing and default settings.
+
+			$options = get_option( dz_biblegateway_votd::option_name );
+			$options = wp_parse_args( $options, array(
+				'default-version' => 'NIV',
+				'extra-versions' => array()
+				) );
+
+			// Validate default version.
+
+			if ( $valid = dz_biblegateway_votd::is_version_available( $input['default-version'] ) )
+				$options['default-version'] = $valid;
+
+			// Validate extra versions.
+
+			if ( is_array( $input['extra-versions'] ) ) {
+				$versions = array();
+				foreach( $input['extra-versions'] as $abbr => $desc ) {
+					$versions[] = "$abbr,$desc\n";
+				}
+			} else {
+				$versions = explode( "\n", $input['extra-versions'] );
+			}
+
+			$valid = array();
+			foreach( $versions as $version ) {
+				$version = strip_tags( $version );
+
+				if ( false === strpos( $version, ',' ) )
+					continue;
+
+				list( $abbr, $desc ) = explode( ',', $version, 2 );
+				$abbr = preg_replace( '/[^A-Z0-9]/', '', strtoupper( $abbr ) );
+				$desc = ucwords( trim( preg_replace( '/[^- .,;:A-Za-z0-9\(\)\[\]]/', '', $desc ) ) );
+
+				if ( !empty( $abbr ) && !empty( $desc ) && !array_key_exists( $abbr, $valid ) && !dz_biblegateway_votd::is_version_available( $abbr ) )
+					$valid[$abbr] = $desc;
+			}
+			$options['extra-versions'] = $valid;
+
+			// Return sanitized options.
+
+			return $options;
 		}
 
 		function setting_field_default_version() {
 			$versions = dz_biblegateway_votd::get_available_versions();
-			$default = get_option( dz_biblegateway_votd::option_name );
-			$default = ( isset( $default['default-version'] ) ) ? $default['default-version'] : 'NIV';
+
+			$options = get_option( dz_biblegateway_votd::option_name );
+			$default = ( isset( $options['default-version'] ) ) ? $options['default-version'] : 'NIV';
 ?>
 <select name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[default-version]' ); ?>">
 <?php
@@ -81,6 +126,25 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 </select>
 <?php
 		}
+
+		function setting_field_extra_versions() {
+			$options = get_option( dz_biblegateway_votd::option_name ); var_dump( $options );
+
+			$versions = '';
+			if ( !empty( $options['extra-versions'] ) && is_array( $options['extra-versions'] ) ) {
+				foreach( $options['extra-versions'] as $abbr => $desc ) {
+					$versions .= "$abbr,$desc\n";
+				}
+			}
+?>
+<textarea name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[extra-versions]' ); ?>" rows="10" cols="50" id="extra_versions" class="large-text code"><?php echo esc_attr( rtrim( $versions, "\n" ) ); ?></textarea><span class="description">You can manually add extra versions available from BibleGateway.com here. Enter one version per line in the format: <code>ABBREVIATION,Full Name</code>.</span>
+<?php
+		}
+
+
+
+
+
 
 		function setting_validation__theme_use_excerpt( $input ) {
 			return ( '1' == $input ) ? 1 : 0;
