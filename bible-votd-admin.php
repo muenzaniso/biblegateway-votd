@@ -1,16 +1,48 @@
 <?php
 if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
+	/**
+	 * dz_biblegateway_votd_admin class.
+	 *
+	 * Handles the administrative options for the dz_biblegateway_votd class.
+	 *
+	 * @version 3.0
+	 * @author Dave Zaikos
+	 * @copyright Copyright (c) 2012, Dave Zaikos
+	 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
+	 */
 	class dz_biblegateway_votd_admin {
 
+		/**
+		 * __construct function.
+		 *
+		 * @access public
+		 * @return void
+		 */
 		public function __construct() {
 			add_action( 'admin_menu', array( &$this, 'add_admin_menu' ) );
 			add_action( 'admin_init', array( &$this, 'settings_init' ) );
 		}
 
+		/**
+		 * add_admin_menu function.
+		 *
+		 * Adds the Bible VOTD option page to the WordPress Options menu.
+		 *
+		 * @access public
+		 * @return void
+		 */
 		public function add_admin_menu() {
 			add_options_page( 'Bible VOTD Settings', 'Bible VOTD', 'manage_options', 'biblevotd-options', array( &$this, 'biblevotd_options_page' ) );
 		}
 
+		/**
+		 * settings_init function.
+		 *
+		 * Utilizes the WordPress Settings API to set up settings.
+		 *
+		 * @access public
+		 * @return void
+		 */
 		public function settings_init() {
 			register_setting( 'dz_biblevotd_options', dz_biblegateway_votd::option_name, array( &$this, 'settings_validation' ) );
 
@@ -19,27 +51,17 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 
 			add_settings_section( 'biblevotd_options_advance', 'Advance', create_function( '', '' ), 'dz_biblevotd_options_sections' );
 			add_settings_field( dz_biblegateway_votd::option_name . '[extra-versions]', 'Additional Versions', array( &$this, 'setting_field_extra_versions' ), 'dz_biblevotd_options_sections', 'biblevotd_options_advance', array( 'label_for' => 'extra_versions' ) );
-
-
-
-
-			// Advanced options.
-
-			register_setting( 'biblevotd_options', '_theme_use_excerpt', array( &$this, 'setting_validation__theme_use_excerpt' ) );
-			add_settings_section( 'biblevotd_options_reading', __( 'Reading' ), create_function( '', '' ), 'biblevotd_options_sections' );
-			add_settings_field( '_theme_use_excerpt', 'For each article on a page, show', array( &$this, 'setting_field__theme_use_excerpt' ), 'biblevotd_options_sections', 'biblevotd_options_reading' );
-
-/*
-			register_setting( 'cmo_options', 'cmo_hosting', array( &$this, 'settings_validation' ) );
-			add_settings_section( 'cmo_options_hosting', 'Hosting', create_function( '', '' ), 'cmo_options_sections' );
-			add_settings_field( 'cmo_hosting[contacts]', 'Contact E-mails', array( &$this, 'contacts_setting_field' ), 'cmo_options_sections', 'cmo_options_hosting', array( 'label_for' => 'contact_emails' ) );
-			add_settings_field( 'cmo_hosting[paypal]', 'PayPal Invoice URI', array( &$this, 'paypal_setting_field' ), 'cmo_options_sections', 'cmo_options_hosting', array( 'label_for' => 'paypal_invoice_uri' ) );
-			add_settings_field( 'cmo_hosting[expiration]', 'Expiration Date', array( &$this, 'expiration_setting_field' ), 'cmo_options_sections', 'cmo_options_hosting', array( 'label_for' => 'expiration_date' ) );
-*/
-
 		}
 
-		function biblevotd_options_page() {
+		/**
+		 * biblevotd_options_page function.
+		 *
+		 * The settings page.
+		 *
+		 * @access public
+		 * @return void
+		 */
+		public function biblevotd_options_page() {
 			settings_errors();
 ?>
 <div class="wrap">
@@ -63,7 +85,17 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 <?php
 		}
 
-		function settings_validation( $input ) {
+		/**
+		 * settings_validation function.
+		 *
+		 * Handles validation for the plugin settings.
+		 *
+		 * @access public
+		 * @see update_option()
+		 * @param mixed $input
+		 * @return void
+		 */
+		public function settings_validation( $input ) {
 
 			// Get existing and default settings.
 
@@ -89,6 +121,8 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 				$versions = explode( "\n", $input['extra-versions'] );
 			}
 
+			$available_versions = array_diff( dz_biblegateway_votd::get_available_versions(), $options['extra-versions'] ); // Separate extra versions from the hard-coded array.
+
 			$valid = array();
 			foreach( $versions as $version ) {
 				$version = strip_tags( $version );
@@ -98,9 +132,9 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 
 				list( $abbr, $desc ) = explode( ',', $version, 2 );
 				$abbr = preg_replace( '/[^A-Z0-9]/', '', strtoupper( $abbr ) );
-				$desc = ucwords( trim( preg_replace( '/[^- .,;:A-Za-z0-9\(\)\[\]]/', '', $desc ) ) );
+				$desc = ucwords( trim( preg_replace( array( '/[^- A-Za-z0-9]/', '/\s{2,}/' ), array( '', ' ' ), $desc ) ) );
 
-				if ( !empty( $abbr ) && !empty( $desc ) && !array_key_exists( $abbr, $valid ) && !dz_biblegateway_votd::is_version_available( $abbr ) )
+				if ( !empty( $abbr ) && !empty( $desc ) && !array_key_exists( $abbr, $valid ) && !array_key_exists( $abbr, $available_versions ) )
 					$valid[$abbr] = $desc;
 			}
 			$options['extra-versions'] = $valid;
@@ -110,7 +144,15 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			return $options;
 		}
 
-		function setting_field_default_version() {
+		/**
+		 * setting_field_default_version function.
+		 *
+		 * Creates a drop down menu with available versions. Allows users to select a default version.
+		 *
+		 * @access public
+		 * @return void
+		 */
+		public function setting_field_default_version() {
 			$versions = dz_biblegateway_votd::get_available_versions();
 
 			$options = get_option( dz_biblegateway_votd::option_name );
@@ -127,8 +169,16 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 <?php
 		}
 
-		function setting_field_extra_versions() {
-			$options = get_option( dz_biblegateway_votd::option_name ); var_dump( $options );
+		/**
+		 * setting_field_extra_versions function.
+		 *
+		 * Creates a text box that allows users to add additional Bible versions.
+		 *
+		 * @access public
+		 * @return void
+		 */
+		public function setting_field_extra_versions() {
+			$options = get_option( dz_biblegateway_votd::option_name );
 
 			$versions = '';
 			if ( !empty( $options['extra-versions'] ) && is_array( $options['extra-versions'] ) ) {
@@ -137,29 +187,8 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 				}
 			}
 ?>
-<textarea name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[extra-versions]' ); ?>" rows="10" cols="50" id="extra_versions" class="large-text code"><?php echo esc_attr( rtrim( $versions, "\n" ) ); ?></textarea><span class="description">You can manually add extra versions available from BibleGateway.com here. Enter one version per line in the format: <code>ABBREVIATION,Full Name</code>.</span>
-<?php
-		}
-
-
-
-
-
-
-		function setting_validation__theme_use_excerpt( $input ) {
-			return ( '1' == $input ) ? 1 : 0;
-		}
-
-		function setting_field__theme_use_excerpt() {
-?>
-<p><label>
-	<input name="_theme_use_excerpt" type="radio" value="0"<?php checked( get_option( '_theme_use_excerpt', 0 ), 0 ); ?> />
-	Full text</label>
-</p>
-<p><label>
-	<input name="_theme_use_excerpt" type="radio" value="1"<?php checked( get_option( '_theme_use_excerpt', 0 ), 1 ); ?> />
-	Summary</label>
-</p>
+<textarea name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[extra-versions]' ); ?>" rows="10" cols="50" id="extra_versions" class="large-text code"><?php echo esc_attr( rtrim( $versions, "\n" ) ); ?></textarea>
+<span class="description">You can manually add extra versions available from BibleGateway.com. Enter one version per line in the format: <code>ABBREVIATION,Full Name</code>.</span>
 <?php
 		}
 
