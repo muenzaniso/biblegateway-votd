@@ -101,7 +101,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 
 			$options = get_option( dz_biblegateway_votd::option_name );
 			$options = wp_parse_args( $options, array(
-				'default-version' => 'NIV',
+				'default-version' => 'NIV1984',
 				'extra-versions' => array()
 				) );
 
@@ -114,7 +114,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 
 			if ( is_array( $input['extra-versions'] ) ) {
 				$versions = array();
-				foreach( $input['extra-versions'] as $abbr => $desc ) {
+				foreach ( $input['extra-versions'] as $abbr => $desc ) {
 					$versions[] = "$abbr,$desc\n";
 				}
 			} else {
@@ -124,7 +124,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			$available_versions = array_diff( dz_biblegateway_votd::get_available_versions(), $options['extra-versions'] ); // Separate extra versions from the hard-coded array.
 
 			$valid = array();
-			foreach( $versions as $version ) {
+			foreach ( $versions as $version ) {
 				$version = strip_tags( $version );
 
 				if ( false === strpos( $version, ',' ) )
@@ -156,11 +156,11 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			$versions = dz_biblegateway_votd::get_available_versions();
 
 			$options = get_option( dz_biblegateway_votd::option_name );
-			$default = ( isset( $options['default-version'] ) ) ? $options['default-version'] : 'NIV';
+			$default = ( isset( $options['default-version'] ) ) ? $options['default-version'] : 'NIV1984';
 ?>
 <select name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[default-version]' ); ?>">
 <?php
-			foreach( $versions as $abbr => $desc ) {
+			foreach ( $versions as $abbr => $desc ) {
 				$selected = selected( $abbr, $default, false );
 				printf ( "\t<option value='%1\$s'%2\$s>%3\$s</option>\n", esc_attr( $abbr ), $selected, esc_attr( $desc ) );
 			}
@@ -182,7 +182,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 
 			$versions = '';
 			if ( !empty( $options['extra-versions'] ) && is_array( $options['extra-versions'] ) ) {
-				foreach( $options['extra-versions'] as $abbr => $desc ) {
+				foreach ( $options['extra-versions'] as $abbr => $desc ) {
 					$versions .= "$abbr,$desc\n";
 				}
 			}

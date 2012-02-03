@@ -235,9 +235,9 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 
 			// Validate user-provided values.
 
-			if ( !$this->is_version_available( $version ) ) {//!TODO Fix.
+			if ( !( $version = $this->is_version_available( $version ) ) ) {
 				$defaults = get_option( self::option_name );
-				$version = ( isset( $defaults['default-version'] ) ) ? $defaults['default-version'] : 'NIV';
+				$version = ( isset( $defaults['default-version'] ) ) ? $defaults['default-version'] : 'NIV1984';
 			}
 
 			$class = implode( ' ', array_map( 'sanitize_html_class', explode( ' ', $class ) ) );
@@ -296,26 +296,17 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 			}
 
 			public function update( $new_instance, $old_instance ) {
-				$defaults = array(
-					'title' => 'Verse of the Day',
-					'version' => 'NIV'
-					);
-
-				$new_instance = wp_parse_args( $new_instance, $defaults );
-				$old_instance = wp_parse_args( $old_instance, $defaults );
 
 				// Sanitize the title.
 
 				$instance['title'] = wp_strip_all_tags( $new_instance['title'], true );
-				if ( empty( $instance['title'] ) )
-					$instance['title'] = $old_instance['title'];
 
 				// Sanitize the version.
 
 				if ( !( $instance['version'] = dz_biblegateway_votd::is_version_available( $new_instance['version'] ) ) ) {
 					if ( !( $instance['version'] = dz_biblegateway_votd::is_version_available( $old_instance['version'] ) ) ) {
-						$defaults = get_option( self::option_name );
-						$instance['version'] = ( isset( $defaults['default-version'] ) ) ? $defaults['default-version'] : 'NIV';
+						$options = get_option( dz_biblegateway_votd::option_name );
+						$instance['version'] = ( isset( $options['default-version'] ) ) ? $options['default-version'] : 'NIV1984';
 					}
 				}
 
@@ -339,7 +330,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 				// Validate selected version.
 
 				if ( empty( $version ) )
-					$version = ( isset( $options['default-version'] ) ) ? $options['default-version'] : 'NIV';
+					$version = ( isset( $options['default-version'] ) ) ? $options['default-version'] : 'NIV1984';
 
 				// Build the form.
 
@@ -351,9 +342,9 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 </p>
 <p>
 	<label for="<?php echo $this->get_field_id( 'version' ); ?>"><?php _e( 'Version:' ); ?></label>
-	<select name="<?php echo $this->get_field_id( 'version' ); ?>">
+	<select id="<?php echo $this->get_field_id( 'version' ); ?>" name="<?php echo $this->get_field_name( 'version' ); ?>">
 <?php
-				foreach( $versions as $abbr => $desc ) {
+				foreach ( $versions as $abbr => $desc ) {
 					$selected = selected( $abbr, $version, false );
 					printf ( "\t<option value='%1\$s'%2\$s>%3\$s</option>\n", esc_attr( $abbr ), $selected, esc_attr( $desc ) );
 				}
