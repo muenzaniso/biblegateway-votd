@@ -74,6 +74,13 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		const transient_name = 'dz_biblegateway_votd_cache';
 
 		/**
+		 * shortcode_name
+		 *
+		 * The name of the shortcode.
+		 */
+		const shortcode_name = 'biblevotd';
+
+		/**
 		 * __construct function.
 		 *
 		 * @since 3.0
@@ -83,7 +90,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		public function __construct() {
 //			add_action( '', array( &$this, '' ) );
 //			add_filter( '', array( &$this, '' ) );
-			add_shortcode( 'biblevotd', array( &$this, 'bible_votd_shortcode' ) );
+			add_shortcode( self::shortcode_name, array( &$this, 'bible_votd_shortcode' ) );
 		}
 
 		/**
@@ -228,7 +235,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 
 			// Validate user-provided values.
 
-			if ( !$this->is_version_available( $version ) ) {
+			if ( !$this->is_version_available( $version ) ) {//!TODO Fix.
 				$defaults = get_option( self::option_name );
 				$version = ( isset( $defaults['default-version'] ) ) ? $defaults['default-version'] : 'NIV';
 			}
@@ -269,127 +276,91 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 */
 		class dz_biblegateway_votd_widget extends WP_Widget {
 
-			public $classname = 'widget_cmo_recent'; // CSS class for widget.
-			public $defaults = array( 'title' => '', 'number' => 4, 'thumbnails' => false ); // Default widget settings.
-
-			function __construct() {
-				parent::__construct( 'cmo_recent_posts_widget', 'Sticky or Recent Posts', array( 'classname' => $this->classname ) );
-				add_action( 'cmo_recent_posts_widget', array( &$this, 'cmo_recent_posts_action' ), 10, 2 );
+			public function __construct() {
+				parent::__construct( 'dz_biblegateway_votd', 'Bible VOTD', array( 'description' => "BibleGateway.com's verse of the day." ) );
 			}
 
-			function widget( $args, $instance ) {
-				extract( $instance, EXTR_SKIP );
-
-				// If is_single, do not include the current post that is being viewed.
-
-				$query_args = array( 'posts_per_page' => $number, 'post_type' => 'post' );
-				if ( is_single() ) {
-					global $post;
-					$query_args['post__not_in'] = array( $post->ID );
-				}
-
-				if  ( apply_filters_ref_array( 'cmo_sticky_or_recent_posts_wp_query', array( true, &$recent, $query_args, $thumbnails ) ) )
-					return;
-
+			public function widget( $args, $instance ) {
 				extract( $args, EXTR_SKIP );
+				extract( $instance, EXTR_SKIP );
 
 				echo $before_widget;
 
 				if ( !empty( $title ) ) {
-					$title = apply_filters( 'cmo_widget_recent_title', $title, $instance );
-					echo $before_title . $title . $after_title;
+					echo $before_title . esc_html( $title ) . $after_title;
 				}
 
-				$this->posts_walker( &$recent, $thumbnails );
+				echo do_shortcode( '[' . dz_biblegateway_votd::shortcode_name . ' version=' . $version . ']' );
 
 				echo $after_widget;
-
-				wp_reset_query();
 			}
 
-			function update( $new_instance, $old_instance ) {
-				$instance['title'] = sanitize_text_field( $new_instance['title'] );
+			public function update( $new_instance, $old_instance ) {
+				$defaults = array(
+					'title' => 'Verse of the Day',
+					'version' => 'NIV'
+					);
 
-				$instance['number'] = absint( $new_instance['number'] );
-				if ( 1 > $instance['number'] )
-					$instance['number'] = $old_instance['number'];
+				$new_instance = wp_parse_args( $new_instance, $defaults );
+				$old_instance = wp_parse_args( $old_instance, $defaults );
 
-				$instance['thumbnails'] = (bool) $new_instance['thumbnails'];
+				// Sanitize the title.
+
+				$instance['title'] = wp_strip_all_tags( $new_instance['title'], true );
+				if ( empty( $instance['title'] ) )
+					$instance['title'] = $old_instance['title'];
+
+				// Sanitize the version.
+
+				if ( !( $instance['version'] = dz_biblegateway_votd::is_version_available( $new_instance['version'] ) ) ) {
+					if ( !( $instance['version'] = dz_biblegateway_votd::is_version_available( $old_instance['version'] ) ) ) {
+						$defaults = get_option( self::option_name );
+						$instance['version'] = ( isset( $defaults['default-version'] ) ) ? $defaults['default-version'] : 'NIV';
+					}
+				}
+
+				// Return.
 
 				return $instance;
 			}
 
-			function form( $instance ) {
-				$instance = wp_parse_args( (array) $instance, $this->defaults );
+			public function form( $instance ) {
+
+				// Get default options.
+
+				$options = get_option( dz_biblegateway_votd::option_name );
 				extract( $instance, EXTR_SKIP );
+
+				// Validate title.
+
+				if  ( empty( $title ) )
+					$title = 'Verse of the Day';
+
+				// Validate selected version.
+
+				if ( empty( $version ) )
+					$version = ( isset( $options['default-version'] ) ) ? $options['default-version'] : 'NIV';
+
+				// Build the form.
+
+				$versions = dz_biblegateway_votd::get_available_versions();
 ?>
 <p>
 	<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ); ?></label>
 	<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
 </p>
 <p>
-	<label for="<?php echo $this->get_field_id( 'number' ); ?>"><?php _e( 'Number of posts to show:' ); ?></label>
-	<input class="widefat" id="<?php echo $this->get_field_id( 'number' ); ?>" name="<?php echo $this->get_field_name( 'number' ); ?>" type="text" value="<?php echo esc_attr( $number ); ?>" />
+	<label for="<?php echo $this->get_field_id( 'version' ); ?>"><?php _e( 'Version:' ); ?></label>
+	<select name="<?php echo $this->get_field_id( 'version' ); ?>">
+<?php
+				foreach( $versions as $abbr => $desc ) {
+					$selected = selected( $abbr, $version, false );
+					printf ( "\t<option value='%1\$s'%2\$s>%3\$s</option>\n", esc_attr( $abbr ), $selected, esc_attr( $desc ) );
+				}
+?>
+	</select>
 </p>
-<p>
-	<input id="<?php echo $this->get_field_id( 'thumbnails' ); ?>" name="<?php echo $this->get_field_name( 'thumbnails' ); ?>" type="checkbox"<?php checked( $thumbnails, true ); ?> />
-	<label for="<?php echo $this->get_field_id( 'thumbnails' ); ?>">Show post thumbnails</label>
-</p>
 <?php
-			}
-
-			/**
-			 * Iterates through each post from the WP_Query object.
-			 *
-			 * This is useful as a sidebar fallback if no widgets are
-			 * active.
-			 *
-			 * @param WP_Query $recent Reference to object containing posts to iterate through.
-			 * @param bool $thumbnails Optional. If true, include selected post thumbnails.
-			 */
-
-			function posts_walker( &$recent, $thumbnails = false ) {
-
-				// Prepare the size of the thumbnail.
-
-				$size = apply_filters( 'cmo_widget_recent_thumbnail_size', array( 40, 40 ), $thumbnails );
-?>
-    	<ul>
-<?php
-				while ( $recent->have_posts() ) :
-					$recent->the_post();
-
-?>
-    		<li class="post-<?php the_ID(); ?>">
-<?php
-					if ( $thumbnails && has_post_thumbnail() ) :
-?>
-    			<a href="<?php the_permalink(); ?>" rel="bookmark" title="<?php the_title_attribute(); ?>"><?php the_post_thumbnail( $size, array( 'class' => 'attachment', 'alt' => '', 'title' => '' ) ); ?></a>
-<?php
-					endif;
-?>
-					<p><a href="<?php the_permalink(); ?>" rel="bookmark" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a><br />
-					<span><?php echo get_the_date(); ?></span></p>
-				</li>
-	<?php
-				endwhile;
-	?>
-    	</ul>
-<?php
-			}
-
-			function cmo_recent_posts_action( $sidebar, $args = array() ) {
-				static $instance = 0;
-				$instance++;
-
-				global $wp_registered_sidebars;
-				$params = $wp_registered_sidebars[$sidebar];
-
-				$params['before_widget'] = sprintf( $params['before_widget'], __CLASS__ . '_action-' . $instance, $this->classname );
-
-				$args = wp_parse_args( $args, $this->defaults );
-
-				$this->widget( $params, $args );
 			}
 
 		}
