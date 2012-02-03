@@ -191,7 +191,21 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * @return bool True if the shortcode is being used, otherwise false.
 		 */
 		private function is_shortcode_active() {
-			return true;
+
+			// Active as widget?
+
+			if ( is_active_widget( false, false, 'dz_biblegateway_votd' ) )
+				return true;
+
+			// Active as shortcode?
+
+			global $posts;
+			foreach ( $posts as $post ) {
+				if ( preg_match( '\\[(\\[?)(' . self::shortcode_name . ')\\b([^\\]\\/]*(?:\\/(?!\\])[^\\]\\/]*)*?)(?:(\\/)\\]|\\](?:([^\\[]*+(?:\\[(?!\\/\\2\\])[^\\[]*+)*+)\\[\\/\\2\\])?)(\\]?)', $post->post_content ) )
+					die('yes');//return true;
+			}
+
+			return false;
 		}
 
 		/**
