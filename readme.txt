@@ -54,9 +54,11 @@ Yes. The initial default is the New International Version (#31); however, when y
 = 3.0 =
 
 * Complete rewrite.
+* Added option to select default Bible version/translation.
+* Added option to add versions/translations from BibleGateway.com that are not bundled with the plugin (all English versions available at the time of this release are bundled; however, you can easily add more versions from the Options page).
 * Added internal documentation for clarity.
-* Added ability for themes or other plugins to modify available translations.
-* Added ability for themes or other plugins to modify the final output for the verse.
+* Added filter for themes or other plugins to modify available translations.
+* Added filter for themes or other plugins to modify the final output for the verse.
 * Added fallback option to display basic BibleGateway.com HTML/JavaScript code to insert the verse (basically what BibleGateway.com has on their web site). This is slower so it is not used by default.
 
 = 2.3 =
