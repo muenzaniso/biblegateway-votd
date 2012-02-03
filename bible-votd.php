@@ -184,19 +184,19 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 
 		/**
 		 * is_shortcode_active function.
-		 * 
+		 *
 		 * Checks if the shortcode is used in an active widget or as a shortcode.
 		 *
 		 * @access private
 		 * @return bool True if the shortcode is being used, otherwise false.
 		 */
 		private function is_shortcode_active() {
-			return true;		
+			return true;
 		}
 
 		/**
 		 * enqueue_scripts function.
-		 * 
+		 *
 		 * Checks if the shortcode is active and, if so, enqueues necessary scripts.
 		 *
 		 * @access public
@@ -207,6 +207,30 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 			if ( $this->is_shortcode_active() ) {
 				wp_enqueue_scripts( 'jquery' );
 			}
+		}
+
+		/**
+		 * get_cached_html_code function.
+		 *
+		 * Returns the cached verse of the day.
+		 *
+		 * @access private
+		 * @return string The HTML code with the verse.
+		 */
+		private function get_cached_html_code() {
+			return $this->get_basic_html_code();
+		}
+
+		/**
+		 * get_jquery_html_code function.
+		 *
+		 * Returns jQuery JavaScript code for embedding the verse of the day on when the DOM is completely loaded.
+		 *
+		 * @access private
+		 * @return string The HTML code to insert the verse.
+		 */
+		private function get_jquery_html_code() {
+			return $this->get_basic_html_code();
 		}
 
 		/**
