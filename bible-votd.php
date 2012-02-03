@@ -88,8 +88,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * @return void
 		 */
 		public function __construct() {
-//			add_action( '', array( &$this, '' ) );
-//			add_filter( '', array( &$this, '' ) );
+			add_action( 'template_redirect', array( &$this, 'enqueue_scripts' ) );
 			add_shortcode( self::shortcode_name, array( &$this, 'bible_votd_shortcode' ) );
 		}
 
@@ -181,6 +180,33 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 				return $_version;
 
 			return false;
+		}
+
+		/**
+		 * is_shortcode_active function.
+		 * 
+		 * Checks if the shortcode is used in an active widget or as a shortcode.
+		 *
+		 * @access private
+		 * @return bool True if the shortcode is being used, otherwise false.
+		 */
+		private function is_shortcode_active() {
+			return true;		
+		}
+
+		/**
+		 * enqueue_scripts function.
+		 * 
+		 * Checks if the shortcode is active and, if so, enqueues necessary scripts.
+		 *
+		 * @access public
+		 * @uses self::is_shortcode_active()
+		 * @return void
+		 */
+		public function enqueue_scripts() {
+			if ( $this->is_shortcode_active() ) {
+				wp_enqueue_scripts( 'jquery' );
+			}
 		}
 
 		/**
