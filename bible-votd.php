@@ -214,7 +214,21 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * @return string The sprintf-ready code to be inserted into the page.
 		 */
 		private function bible_votd_code_helper() {
-			return $this->get_basic_html_code();
+			$options = get_option( self::option_name );
+			$method = ( isset( $options['embed-method'] ) ) ? $options['embed-method'] : 'jquery';
+
+			switch( $method ) {
+				case 'cache':
+					if ( get_transient( self::transient_name ) )
+						return $this->get_cached_html_code(); //!TODO: cache and jquery may need a class property so we know whether to add the JavaScript at the end.
+
+				case 'jquery':
+					return $this->get_jquery_html_code();
+
+				case 'basic':
+				default:
+					return $this->get_basic_html_code();
+			}
 		}
 
 		/**

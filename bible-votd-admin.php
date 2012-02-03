@@ -51,6 +51,8 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 
 			add_settings_section( 'biblevotd_options_advance', 'Advance', create_function( '', '' ), 'dz_biblevotd_options_sections' );
 			add_settings_field( dz_biblegateway_votd::option_name . '[extra-versions]', 'Additional Versions', array( &$this, 'setting_field_extra_versions' ), 'dz_biblevotd_options_sections', 'biblevotd_options_advance', array( 'label_for' => 'extra_versions' ) );
+
+			//!TODO: Add setting for caching. Also need cron and plugin (de-)activation hooks.
 		}
 
 		/**
