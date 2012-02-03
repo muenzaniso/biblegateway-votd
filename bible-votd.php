@@ -88,7 +88,6 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * @return void
 		 */
 		public function __construct() {
-			add_action( 'template_redirect', array( &$this, 'enqueue_scripts' ) );
 			add_shortcode( self::shortcode_name, array( &$this, 'bible_votd_shortcode' ) );
 		}
 
@@ -183,44 +182,15 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		}
 
 		/**
-		 * is_shortcode_active function.
+		 * bible_votd_footer_scripts function.
 		 *
-		 * Checks if the shortcode is used in an active widget or as a shortcode.
-		 *
-		 * @access private
-		 * @return bool True if the shortcode is being used, otherwise false.
-		 */
-		private function is_shortcode_active() {
-
-			// Active as widget?
-
-			if ( is_active_widget( false, false, 'dz_biblegateway_votd' ) )
-				return true;
-
-			// Active as shortcode?
-
-			global $posts;
-			foreach ( $posts as $post ) {
-				if ( preg_match( '\\[(\\[?)(' . self::shortcode_name . ')\\b([^\\]\\/]*(?:\\/(?!\\])[^\\]\\/]*)*?)(?:(\\/)\\]|\\](?:([^\\[]*+(?:\\[(?!\\/\\2\\])[^\\[]*+)*+)\\[\\/\\2\\])?)(\\]?)', $post->post_content ) )
-					die('yes');//return true;
-			}
-
-			return false;
-		}
-
-		/**
-		 * enqueue_scripts function.
-		 *
-		 * Checks if the shortcode is active and, if so, enqueues necessary scripts.
+		 * Prints the necessary JavaScript in the footer to load the verse of the day.
 		 *
 		 * @access public
-		 * @uses self::is_shortcode_active()
 		 * @return void
 		 */
-		public function enqueue_scripts() {
-			if ( $this->is_shortcode_active() ) {
-				wp_enqueue_scripts( 'jquery' );
-			}
+		public function bible_votd_footer_scripts() {
+
 		}
 
 		/**
@@ -244,7 +214,9 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * @return string The HTML code to insert the verse.
 		 */
 		private function get_jquery_html_code() {
-			return $this->get_basic_html_code();
+			return '<a href="http://www.biblegateway.com/">BibleGateway.com</a>&#8217;s verse of the day&#8230;
+';
+			// sprintf( $votd, $version, $class, $instance );
 		}
 
 		/**
@@ -284,9 +256,11 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 			switch( $method ) {
 				case 'cache':
 					if ( get_transient( self::transient_name ) )
-						return $this->get_cached_html_code(); //!TODO: cache and jquery may need a class property so we know whether to add the JavaScript at the end.
+						return $this->get_cached_html_code();
 
 				case 'jquery':
+					wp_enqueue_script( 'jquery' );
+					add_action( 'wp_print_footer_scripts', array( &$this, 'bible_votd_footer_scripts' ) );
 					return $this->get_jquery_html_code();
 
 				case 'basic':
