@@ -50,7 +50,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * @access private
 		 * @static
 		 */
-		static private $instances = array();
+		private static $instances = array();
 
 		/**
 		 * option_name
@@ -84,53 +84,6 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 //			add_action( '', array( &$this, '' ) );
 //			add_filter( '', array( &$this, '' ) );
 			add_shortcode( 'biblevotd', array( &$this, 'bible_votd_shortcode' ) );
-		}
-
-		/**
-		 * get function.
-		 *
-		 * Retrieves from the WordPress options table for this plugin the specific option value, or its default value.
-		 *
-		 * @access private
-		 * @uses get_option()
-		 * @param string $var
-		 * @param bool $default (default: false)
-		 * @return mixed The value of the specified option or false if nothing was found.
-		 */
-		private function get( $var, $default = false ) {
-			$options = (array) get_option( self::option_name, array() );
-			if ( isset( $options[$var] ) && !$default )
-				return $options[$var];
-
-			switch( $var ) {
-				case 'default-version':
-					return 'NIV';
-			}
-
-			return false;
-		}
-
-		/**
-		 * set function.
-		 *
-		 * Updates the specific option for this plugin in the WordPress options table.
-		 *
-		 * This function, along with self::get(), wrap options in an array so the plugin only uses one
-		 * row in the database table (i.e. neat and tidy).
-		 *
-		 * @access private
-		 * @see self::get()
-		 * @uses get_option()
-		 * @uses update_option()
-		 * @param mixed $option
-		 * @return bool False if value was not updated and true if value was updated.
-		 */
-		private function set( $var, $value ) {
-			$options = (array) get_option( self::option_name, array() );
-
-			$options[$var] = $value;
-
-			return update_option( self::option_name, $options );
 		}
 
 		/**
@@ -275,8 +228,10 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 
 			// Validate user-provided values.
 
-			if ( !$this->is_version_available( $version ) )
-				$version = $this->get( 'default-version' );
+			if ( !$this->is_version_available( $version ) ) {
+				$defaults = get_option( self::option_name );
+				$version = ( isset( $defaults['default-version'] ) ) ? $defaults['default-version'] : 'NIV';
+			}
 
 			$class = implode( ' ', array_map( 'sanitize_html_class', explode( ' ', $class ) ) );
 
@@ -446,7 +401,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		add_action( 'widgets_init', create_function( '', 'register_widget( "dz_biblegateway_votd_widget" );' ) );
 	}
 
-	if ( is_admin() )
+	if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) )
 		include plugin_dir_path( __FILE__ ) . 'bible-votd-admin.php';
 }
 
