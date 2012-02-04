@@ -10,11 +10,13 @@ Adds BibleGateway.com's verse of the day as a sidebar widget, or on page or post
 
 == Description ==
 
-Adds [BibleGateway.com](http://www.biblegateway.com/)'s verse of the day as a sidebar widget or inside a page or post using a the shortcode `[bible-votd]`. Different Bible translations can be selected from the widget's page or as options in the shortcode.
+Adds [BibleGateway.com](http://www.biblegateway.com/)'s verse of the day as a sidebar widget or inside a page or post using a the shortcode `[biblevotd]`. Different Bible translations can be selected from the widget's page or as options in the shortcode.
 
 The plugin defaults to using the NIV translation. You can specify other translations in the widget settings or with the "version" option in the shortcode. For example, to use the KJV in a page or post, write:
 
-`[bible-votd ver="KJV"]`
+`[bible-votd version="KJV"]`
+
+Please note the usage for the shortcode has changed. In previous versions the shortcode was `[bible-votd]` and now it is `[biblevotd]`. Additionally, specifying a version used to be done with the `ver` option and is now done with the `version` option.
 
 == Installation ==
 
@@ -51,6 +53,10 @@ The plugin defaults to using the NIV translation. You can specify other translat
 = What if I want a version not listed? =
 
 BibleGateway.com has a list of available versions for their verse of the day. You can view that page to find the version you want. Additional versions can be added from the plugin's setting page, then used by the shortcode or widget. If BibleGateway makes it available, you can add it and use it!
+
+= I want to format the way the verse appears on my site. How can I do that? =
+
+The plugin will wrap the verse in a CSS class named `biblevotd`. You can use that to add CSS instructions to your theme's style.css file to provide specific formatting. If you want to use a class name other than "biblevotd" you can simply pass `class="classname"` as an option when using the shortcode (for example, `[biblevotd class="dailyverse"]`). Widgets are automatically provided with additional CSS class names by WordPress and can be uniquely formatted using those.
 
 = Why does using the plugin cause page load times to increase? =
 

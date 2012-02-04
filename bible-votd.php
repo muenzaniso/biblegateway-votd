@@ -78,7 +78,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 *
 		 * The name of the shortcode.
 		 */
-		const shortcode_name = 'bible-votd';
+		const shortcode_name = 'biblevotd';
 
 		/**
 		 * __construct function.
@@ -198,7 +198,15 @@ jQuery(document).ready(function(b){var a=<?php echo json_encode( $this->instance
 		 * @return string The HTML code with the verse.
 		 */
 		private function get_cached_html_code() {
-			return $this->get_jquery_html_code();
+			$cache = get_transient( self::transient_name );
+
+			end( $this->instances );
+			$version = $this->instances[key( $this->instances )];
+
+			if ( isset( $cache[$version] ) )
+				return $cache[$version];
+
+			return false;
 		}
 
 		/**
@@ -246,8 +254,10 @@ jQuery(document).ready(function(b){var a=<?php echo json_encode( $this->instance
 
 			switch( $method ) {
 				case 'cache':
-					if ( get_transient( self::transient_name ) )
-						return $this->get_cached_html_code();
+					if ( get_transient( self::transient_name ) ) {
+						if ( !( $cache = $this->get_cached_html_code() ) )
+							return $cache;
+					}
 
 				case 'jquery':
 					wp_enqueue_script( 'jquery' );
@@ -333,7 +343,7 @@ jQuery(document).ready(function(b){var a=<?php echo json_encode( $this->instance
 					echo $before_title . esc_html( $title ) . $after_title;
 				}
 
-				echo do_shortcode( '[' . dz_biblegateway_votd::shortcode_name . ' version=' . $version . ']' );
+				echo do_shortcode( '[' . dz_biblegateway_votd::shortcode_name . ' version="' . $version . '"]' );
 
 				echo $after_widget;
 			}

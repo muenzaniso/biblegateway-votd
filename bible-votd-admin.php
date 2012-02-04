@@ -89,6 +89,10 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 	<p>The BibleGateway.com plugin is independently written and maintained by <a href="http://zaikos.com/">Dave Zaikos</a> and in no way affiliated with BibleGateway.com.</p>
 	<p>If you use this plugin, please consider <a href="http://zaikos.com/donate/">making a donation</a> to support its continued development. Donations from users such as yourself help ensure this software&#8217;s future.</p>
 
+	<h3>Usage</h3>
+
+	<p>Use the <a href="<?php echo admin_url( 'widgets.php' ); ?>">Widgets</a> page to add the verse to one or more of your sidebars. You can include the verse in a page or post by using the shortcode <code>[biblevotd]</code>. When using the shortcode you can override the default version (set below) by providing the version abbreviation (for example, <code>[biblevotd version="KJV"]</code> to use the King James Version.</p>
+
 	<form action="options.php" method="post">
 <?php
 			settings_fields( 'dz_biblevotd_options' );
