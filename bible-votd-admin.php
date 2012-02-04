@@ -103,7 +103,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 
 			$options = get_option( dz_biblegateway_votd::option_name );
 			$options = wp_parse_args( $options, array(
-				'default-version' => 'NIV1984',
+				'default-version' => 'NIV',
 				'extra-versions' => array()
 				) );
 
@@ -158,7 +158,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			$versions = dz_biblegateway_votd::get_available_versions();
 
 			$options = get_option( dz_biblegateway_votd::option_name );
-			$default = ( isset( $options['default-version'] ) ) ? $options['default-version'] : 'NIV1984';
+			$default = ( isset( $options['default-version'] ) ) ? $options['default-version'] : 'NIV';
 ?>
 <select name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[default-version]' ); ?>">
 <?php

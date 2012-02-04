@@ -107,36 +107,26 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 
 			if ( empty( $versions ) ) {
 				$versions = array(
-					'KJ21' => '21st Century King James Version',
 					'ASV' => 'American Standard Version',
 					'AMP' => 'Amplified Bible',
 					'CEB' => 'Common English Bible',
-					'CEV' => 'Contemporary English Version',
 					'DARBY' => 'Darby Translation',
-					'DRA' => 'Douay-Rheims 1899 American Edition',
-					'ERV' => 'Easy-to-Read Version',
 					'ESV' => 'English Standard Version',
 					'ESVUK' => 'English Standard Version Anglicised',
-					'GW' => 'GOD\'S WORD Translation',
-					'GNT' => 'Good News Translation',
+					'GW' => 'GOD&#8217;S WORD Translation',
 					'HCSB' => 'Holman Christian Standard Bible',
 					'PHILLIPS' => 'J.B. Phillips New Testament',
 					'KJV' => 'King James Version',
 					'LEB' => 'Lexham English Bible',
-					'MSG' => 'The Message',
 					'NASB' => 'New American Standard Bible',
-					'NCV' => 'New Century Version',
-					'NIRV' => 'New International Reader\'s Version',
+					'NIRV' => 'New International Reader&#8217;s Version',
 					'NIV' => 'New International Version',
-					'NIV1984' => 'New International Version 1984',
 					'NIVUK' => 'New International Version - UK',
-					'NKJV' => 'New King James Version',
 					'NLV' => 'New Life Version',
-					'NLT' => 'New Living Translation',
-					'TNIV' => 'Today\'s New International Version',
+					'TNIV' => 'Today&#8217;s New International Version',
 					'WE' => 'Worldwide English (New Testament)',
 					'WYC' => 'Wycliffe Bible',
-					'YLT' => 'Young\'s Literal Translation'
+					'YLT' => 'Young&#8217;s Literal Translation'
 					);
 
 				// Add user-defined translations.
@@ -182,61 +172,22 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		}
 
 		/**
-		 * bible_votd_footer_scripts function.
+		 * bible_votd_footer_script function.
 		 *
 		 * Prints the necessary JavaScript in the footer to load the verse of the day.
 		 *
 		 * @access public
 		 * @return void
 		 */
-		public function bible_votd_footer_scripts() {
-			$version = array( 'NIV', 'NIV', 'KJffV' );
+		public function bible_votd_footer_script() {
+			$version = array( 'NIV', 'NIV', 'ASkkkV' );
 ?>
 <script type="text/javascript">
 /* <![CDATA[ */
-jQuery( document ).ready( function( $ ) {
-	var dz_biblevotd_versions = <?php echo json_encode( $version ); ?>;
-	$.each( dz_biblevotd_versions, function( id, abbr ) {
-		$.getJSON( 'http://www.biblegateway.com/votd/get?callback=?', { 'format' : 'json', 'version' : abbr }, function( json ) {
-			console.log( json );
-
-			if ( hasOwnProperty( json.error ) ) {
-				console.log( "I failed." );
-				return true;
-			}
-		
-			votd = votd.votd;
-			console.log( votd );
-			
-			var audiolink = '';
-/*
-			if ( 'undefined' != typeof votd.audiolink )
-				audiolink = ( ' <a href="' + votd.audiolink + '" title="Listen to chapter"><img width="13" height="12" src="http://www.biblegateway.com/resources/audio/images/sound.gif" alt="Listen to chapter" /></a>' : '' );
-*/
-				
-			$( 'div#biblegateway-votd-' + id ).html(
-				votd.text + ' &#8212; <a href="' + votd.permalink +'">' + votd.reference + '</a>.' +
-				audiolink +
-				' <a href="' + votd.copyrightlink + '">' + votd.copyright + '</a>.' +
-				' Powered by <a href="http://www.biblegateway.com/">BibleGateway.com</a>.'
-			);
-		} );
-	} );
-} );
+jQuery(document).ready(function(b){var a=<?php echo json_encode( $version ); ?>;b.each(a,function(d,c){b.getJSON("http://www.biblegateway.com/votd/get?callback=?",{format:"json",version:c},function(f){if("undefined"!=typeof f.error){return true;}var e=f.votd;b("div#biblegateway-votd-"+d).html(e.text+' &#8212; <a href="'+e.permalink+'">'+e.reference+"</a>."+("undefined"!=typeof e.audiolink?' <a href="'+e.audiolink+'" title="Listen to chapter"><img width="13" height="12" src="http://www.biblegateway.com/resources/audio/images/sound.gif" alt="Listen to chapter" /></a>':"")+' <a href="'+e.copyrightlink+'">'+e.copyright+'</a>. Powered by <a href="http://www.biblegateway.com/">BibleGateway.com</a>.');});});});
 /* ]]> */
 </script>
 <?php
-/*
-    var votd = json.votd;
-    document.write('<div>' + votd.text);
-    document.write(' -<a href="' + votd.permalink +'">' + votd.reference + '</a>');
-    if (votd.audiolink) {
-      document.write(' <a href="' + votd.audiolink + '" title="Listen to chapter"><img alt="listen to chapter" src="http://www.biblegateway.com/resources/audio/images/sound.gif" border=0/></a>');
-    }
-    document.write(' <a href="' + votd.copyrightlink + '">' + votd.copyright + '</a>');
-    document.write('<br/><br/>Powered by <a href="http://www.biblegateway.com/">BibleGateway.com</a>');
-    document.write('</div>');
-*/
 		}
 
 		/**
@@ -301,7 +252,7 @@ jQuery( document ).ready( function( $ ) {
 
 				case 'jquery':
 					wp_enqueue_script( 'jquery' );
-					add_action( 'wp_print_footer_scripts', array( &$this, 'bible_votd_footer_scripts' ) );
+					add_action( 'wp_print_footer_scripts', array( &$this, 'bible_votd_footer_script' ) );
 					return $this->get_jquery_html_code();
 
 				case 'basic':
@@ -330,7 +281,7 @@ jQuery( document ).ready( function( $ ) {
 
 			if ( !( $version = $this->is_version_available( $version ) ) ) {
 				$defaults = get_option( self::option_name );
-				$version = ( isset( $defaults['default-version'] ) ) ? $defaults['default-version'] : 'NIV1984';
+				$version = ( isset( $defaults['default-version'] ) ) ? $defaults['default-version'] : 'NIV';
 			}
 
 			$class = implode( ' ', array_map( 'sanitize_html_class', explode( ' ', $class ) ) );
@@ -399,7 +350,7 @@ jQuery( document ).ready( function( $ ) {
 				if ( !( $instance['version'] = dz_biblegateway_votd::is_version_available( $new_instance['version'] ) ) ) {
 					if ( !( $instance['version'] = dz_biblegateway_votd::is_version_available( $old_instance['version'] ) ) ) {
 						$options = get_option( dz_biblegateway_votd::option_name );
-						$instance['version'] = ( isset( $options['default-version'] ) ) ? $options['default-version'] : 'NIV1984';
+						$instance['version'] = ( isset( $options['default-version'] ) ) ? $options['default-version'] : 'NIV';
 					}
 				}
 
@@ -423,7 +374,7 @@ jQuery( document ).ready( function( $ ) {
 				// Validate selected version.
 
 				if ( empty( $version ) )
-					$version = ( isset( $options['default-version'] ) ) ? $options['default-version'] : 'NIV1984';
+					$version = ( isset( $options['default-version'] ) ) ? $options['default-version'] : 'NIV';
 
 				// Build the form.
 
