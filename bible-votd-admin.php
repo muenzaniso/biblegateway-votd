@@ -91,7 +91,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 
 	<h3>Usage</h3>
 
-	<p>Use the <a href="<?php echo admin_url( 'widgets.php' ); ?>">Widgets</a> page to add the verse to one or more of your sidebars. You can include the verse in a page or post by using the shortcode <code>[biblevotd]</code>. When using the shortcode you can override the default version (set below) by providing the version abbreviation (for example, <code>[biblevotd version="KJV"]</code> to use the King James Version.</p>
+	<p>Use the <a href="<?php echo admin_url( 'widgets.php' ); ?>">Widgets</a> page to add the verse to one or more of your sidebars. You can include the verse in a page or post by using the shortcode <code>[biblevotd]</code>. When using the shortcode you can override the default version (set below) by providing the version abbreviation (for example, <code>[biblevotd version="KJV"]</code> to use the King James Version).</p>
 
 	<form action="options.php" method="post">
 <?php
