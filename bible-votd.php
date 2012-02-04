@@ -190,7 +190,53 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * @return void
 		 */
 		public function bible_votd_footer_scripts() {
+			$version = array( 'NIV', 'NIV', 'KJffV' );
+?>
+<script type="text/javascript">
+/* <![CDATA[ */
+jQuery( document ).ready( function( $ ) {
+	var dz_biblevotd_versions = <?php echo json_encode( $version ); ?>;
+	$.each( dz_biblevotd_versions, function( id, abbr ) {
+		$.getJSON( 'http://www.biblegateway.com/votd/get?callback=?', { 'format' : 'json', 'version' : abbr }, function( json ) {
+			console.log( json );
 
+			if ( hasOwnProperty( json.error ) ) {
+				console.log( "I failed." );
+				return true;
+			}
+		
+			votd = votd.votd;
+			console.log( votd );
+			
+			var audiolink = '';
+/*
+			if ( 'undefined' != typeof votd.audiolink )
+				audiolink = ( ' <a href="' + votd.audiolink + '" title="Listen to chapter"><img width="13" height="12" src="http://www.biblegateway.com/resources/audio/images/sound.gif" alt="Listen to chapter" /></a>' : '' );
+*/
+				
+			$( 'div#biblegateway-votd-' + id ).html(
+				votd.text + ' &#8212; <a href="' + votd.permalink +'">' + votd.reference + '</a>.' +
+				audiolink +
+				' <a href="' + votd.copyrightlink + '">' + votd.copyright + '</a>.' +
+				' Powered by <a href="http://www.biblegateway.com/">BibleGateway.com</a>.'
+			);
+		} );
+	} );
+} );
+/* ]]> */
+</script>
+<?php
+/*
+    var votd = json.votd;
+    document.write('<div>' + votd.text);
+    document.write(' -<a href="' + votd.permalink +'">' + votd.reference + '</a>');
+    if (votd.audiolink) {
+      document.write(' <a href="' + votd.audiolink + '" title="Listen to chapter"><img alt="listen to chapter" src="http://www.biblegateway.com/resources/audio/images/sound.gif" border=0/></a>');
+    }
+    document.write(' <a href="' + votd.copyrightlink + '">' + votd.copyright + '</a>');
+    document.write('<br/><br/>Powered by <a href="http://www.biblegateway.com/">BibleGateway.com</a>');
+    document.write('</div>');
+*/
 		}
 
 		/**
@@ -214,9 +260,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * @return string The HTML code to insert the verse.
 		 */
 		private function get_jquery_html_code() {
-			return '<a href="http://www.biblegateway.com/">BibleGateway.com</a>&#8217;s verse of the day&#8230;
-';
-			// sprintf( $votd, $version, $class, $instance );
+			return '<div id="biblegateway-votd-%3$d">Loading <a href="http://www.biblegateway.com/">BibleGateway.com</a>&#8217;s verse of the day&#8230;</div>';
 		}
 
 		/**
@@ -232,12 +276,9 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * @return string The HTML code to insert the verse.
 		 */
 		private function get_basic_html_code() {
-			$code = '<script type="text/javascript" language="JavaScript" src="http://www.biblegateway.com/votd/votd.write.callback.js"></script>
+			return '<script type="text/javascript" language="JavaScript" src="http://www.biblegateway.com/votd/votd.write.callback.js"></script>
 <script type="text/javascript" language="JavaScript" src="http://www.biblegateway.com/votd/get?format=json&amp;version=%1$s&amp;callback=BG.votdWriteCallback"></script>
-<noscript><iframe framespacing="0" frameborder="no" src="http://www.biblegateway.com/votd/get?format=html&amp;version=%1$s">View Verse of the Day</iframe></noscript>
-';
-
-			return $code;
+<noscript><iframe framespacing="0" frameborder="no" src="http://www.biblegateway.com/votd/get?format=html&amp;version=%1$s">View Verse of the Day</iframe></noscript>';
 		}
 
 		/**
@@ -303,8 +344,8 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 			// Build the code.
 
 			$votd = "\n<!-- BibleGateway.com Verse of the Day plugin by Dave Zaikos (http://zaikos.com/biblegateway-votd/). -->\n"; /* Luke 6:31. Please do not remove the credit. Thank you! */
-			$votd .= "<div id='biblevotd-%3\$d' class='%2\$s'>\n";
-			$votd .= $this->bible_votd_code_helper();
+			$votd .= "<div id='dz-biblevotd-%3\$d' class='%2\$s'>\n";
+			$votd .= "\t" . $this->bible_votd_code_helper() . "\n";
 			$votd .= "</div>\n";
 
 			$votd = sprintf( $votd, $version, $class, $instance );
