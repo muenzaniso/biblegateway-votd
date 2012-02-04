@@ -134,7 +134,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 
 				list( $abbr, $desc ) = explode( ',', $version, 2 );
 				$abbr = preg_replace( '/[^A-Z0-9]/', '', strtoupper( $abbr ) );
-				$desc = ucwords( trim( preg_replace( array( '/[^- A-Za-z0-9]/', '/\s{2,}/' ), array( '', ' ' ), $desc ) ) );
+				$desc = ucwords( trim( preg_replace( array( '/[^- A-Za-z0-9\(\)]/', '/\s{2,}/' ), array( '', ' ' ), $desc ) ) );
 
 				if ( !empty( $abbr ) && !empty( $desc ) && !array_key_exists( $abbr, $valid ) && !array_key_exists( $abbr, $available_versions ) )
 					$valid[$abbr] = $desc;
