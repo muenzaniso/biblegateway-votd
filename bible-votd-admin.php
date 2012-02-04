@@ -19,8 +19,24 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		 * @return void
 		 */
 		public function __construct() {
+			add_filter( 'plugin_action_links_' . str_replace( '-admin', '', plugin_basename( __FILE__ ) ), array( &$this, 'add_plugin_page_settings_link' ) );
 			add_action( 'admin_menu', array( &$this, 'add_admin_menu' ) );
 			add_action( 'admin_init', array( &$this, 'settings_init' ) );
+		}
+
+		/**
+		 * add_plugin_page_settings_link function.
+		 *
+		 * Adds a Settings link for this plugin on the plugins page.
+		 *
+		 * @access public
+		 * @param array $actions
+		 * @return array Array of actions for this plugin on the plugins page.
+		 */
+		public function add_plugin_page_settings_link( $actions ) {
+			$settings_action = sprintf( '<a href="%s">%s</a>', admin_url( 'options-general.php?page=biblevotd-options' ), __( 'Settings' ) );
+			array_unshift( $actions, $settings_action );
+			return $actions;
 		}
 
 		/**
