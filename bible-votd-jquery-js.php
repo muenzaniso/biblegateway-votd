@@ -2,7 +2,7 @@
 <script type="text/javascript">
 /* <![CDATA[ */
 jQuery( document ).ready( function( $ ) {
-	var dz_biblevotd_versions = <?php echo json_encode( $version ); ?>;
+	var dz_biblevotd_versions = <?php echo json_encode( $this->instances ); ?>;
 	$.each( dz_biblevotd_versions, function( id, abbr ) {
 		$.getJSON( 'http://www.biblegateway.com/votd/get?callback=?', { 'format' : 'json', 'version' : abbr }, function( json ) {
 			if ( 'undefined' != typeof json.error )

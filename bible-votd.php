@@ -78,7 +78,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 *
 		 * The name of the shortcode.
 		 */
-		const shortcode_name = 'biblevotd';
+		const shortcode_name = 'bible-votd';
 
 		/**
 		 * __construct function.
@@ -180,11 +180,10 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * @return void
 		 */
 		public function bible_votd_footer_script() {
-			$version = array( 'NIV', 'NIV', 'ASkkkV' );
 ?>
 <script type="text/javascript">
 /* <![CDATA[ */
-jQuery(document).ready(function(b){var a=<?php echo json_encode( $version ); ?>;b.each(a,function(d,c){b.getJSON("http://www.biblegateway.com/votd/get?callback=?",{format:"json",version:c},function(f){if("undefined"!=typeof f.error){return true;}var e=f.votd;b("div#biblegateway-votd-"+d).html(e.text+' &#8212; <a href="'+e.permalink+'">'+e.reference+"</a>."+("undefined"!=typeof e.audiolink?' <a href="'+e.audiolink+'" title="Listen to chapter"><img width="13" height="12" src="http://www.biblegateway.com/resources/audio/images/sound.gif" alt="Listen to chapter" /></a>':"")+' <a href="'+e.copyrightlink+'">'+e.copyright+'</a>. Powered by <a href="http://www.biblegateway.com/">BibleGateway.com</a>.');});});});
+jQuery(document).ready(function(b){var a=<?php echo json_encode( $this->instances ); ?>;b.each(a,function(d,c){b.getJSON("http://www.biblegateway.com/votd/get?callback=?",{format:"json",version:c},function(f){if("undefined"!=typeof f.error){return true;}var e=f.votd;b("div#biblegateway-votd-"+d).html(e.text+' &#8212; <a href="'+e.permalink+'">'+e.reference+"</a>."+("undefined"!=typeof e.audiolink?' <a href="'+e.audiolink+'" title="Listen to chapter"><img width="13" height="12" src="http://www.biblegateway.com/resources/audio/images/sound.gif" alt="Listen to chapter" /></a>':"")+' <a href="'+e.copyrightlink+'">'+e.copyright+'</a>. Powered by <a href="http://www.biblegateway.com/">BibleGateway.com</a>.');});});});
 /* ]]> */
 </script>
 <?php
@@ -199,7 +198,7 @@ jQuery(document).ready(function(b){var a=<?php echo json_encode( $version ); ?>;
 		 * @return string The HTML code with the verse.
 		 */
 		private function get_cached_html_code() {
-			return $this->get_basic_html_code();
+			return $this->get_jquery_html_code();
 		}
 
 		/**
@@ -288,9 +287,9 @@ jQuery(document).ready(function(b){var a=<?php echo json_encode( $version ); ?>;
 
 			// Get and update instance.
 
-			$this->instance[] = $version;
-			end( $this->instance );
-			$instance = key( $this->instance );
+			$this->instances[] = $version;
+			end( $this->instances );
+			$instance = key( $this->instances );
 
 			// Build the code.
 
