@@ -14,7 +14,7 @@ Adds [BibleGateway.com](http://www.biblegateway.com/)'s verse of the day as a si
 
 The plugin defaults to using the NIV translation. You can specify other translations in the widget settings or with the "version" option in the shortcode. For example, to use the KJV in a page or post, write:
 
-`[bible-votd version="KJV"]`
+`[biblevotd version="KJV"]`
 
 Version 3.0 of this plugin is a complete rewrite. It leverages several new methods for retrieving the verse to prevent any delays when visitors load your site. The plugin will attempt to retrieve and cache the verse once daily. If it is available it will directly serve the cache. If it is not, it will fallback to using the jQuery JavaScript library. This allows the JavaScript code necessary to insert the verse to not execute until the entire page on your site has finished loading (allowing your site load uninterrupted, regardless of any delays from BibleGateway.com).
 
@@ -26,11 +26,11 @@ Because of the unique nature of this plugin, you can insert multiple verses of t
 2. Activate the plugin in the 'Plugins' page in WordPress.
 3. Optionally set your defaults from the settings page.
 4. Add the Bible VOTD widget to your sidebar. Or,
-5. Type `[bible-votd]` in the page or post content where you want the verse to appear.
+5. Type `[biblevotd]` in the page or post content where you want the verse to appear.
 
 == Frequently Asked Questions ==
 
-= What versions are for supported when including the verse? =
+= What translations are for supported when including the verse? =
 
 * ASV = American Standard Version
 * AMP = Amplified Bible
@@ -53,13 +53,13 @@ Because of the unique nature of this plugin, you can insert multiple verses of t
 * WYC = Wycliffe Bible
 * YLT = Young's Literal Translation
 
-= What if I want a version not listed? =
+= What if I want a translation not listed above? =
 
-BibleGateway.com [has a list](http://www.biblegateway.com/usage/votd/custom_votd.php) of available versions for their verse of the day. You can view that page to find the version you want. Additional versions can be added from the plugin's settings page, then used by the shortcode or widget. If BibleGateway makes it available, you can add it and use it!
+BibleGateway.com [has a list](http://www.biblegateway.com/usage/votd/custom_votd.php) of available translations for their verse of the day. You can view that page to find the translation you want. Additional translations can be added from the plugin's settings page, then used by the shortcode or widget. If BibleGateway makes it available, you can add it and use it!
 
 = I want to format the way the verse appears on my site. How can I do that? =
 
-The plugin will wrap the verse in a CSS class named `biblevotd`. You can use that to add CSS instructions to your theme's style.css file to provide specific formatting. If you want to use a class name other than "biblevotd" you can simply pass `class="classname"` as an option when using the shortcode (for example, `[bible-votd class="dailyverse"]`). Widgets are automatically provided with additional CSS class names by WordPress and can be uniquely formatted using those.
+The plugin will wrap the verse in a CSS class named `biblevotd`. You can use that to add CSS instructions to your theme's style.css file to provide specific formatting. If you want to use a class name other than "biblevotd" you can simply pass `class="classname"` as an option when using the shortcode (for example, `[biblevotd class="dailyverse"]`). Widgets are automatically provided with additional CSS class names by WordPress and can be uniquely formatted using those.
 
 = I need more than just CSS to change the way the verse appears. What can I do? =
 
@@ -81,9 +81,9 @@ The Basic method should only be used if Cache and jQuery are not working. It use
 
 A complete rewrite of the plugin. Please see the Changelog for full details.
 
-Note the usage for the shortcode has changed. In previous versions the shortcode was `[bible-votd]` and now it is `[biblevotd]`. Additionally, specifying a version used to be done with the `ver` option and is now done with the `version` option. For example, to print the King James Version using the shortcode you previous typed `[bible-votd ver="9"]`. Now you type `[biblevotd version="KJV"]`.
+Note the usage for the shortcode has changed. In previous versions the shortcode was `[bible-votd]` and now it is `[biblevotd]`. Additionally, specifying a translation used to be done with the `ver` option and is now done with the `version` option. For example, to print the King James Version using the shortcode you previous typed `[bible-votd ver="9"]`. Now you type `[biblevotd version="KJV"]`.
 
-If you have been using a widget, you will have to re-add the widget to your sidebar(s) after updating. This is necessary due to a significant change in the underlying code. However, the positive side of this is now you can add multiple widgets and have different versions for the day's verse.
+If you have been using a widget, you will have to re-add the widget to your sidebar(s) after updating. This is necessary due to a significant change in the underlying code. However, the positive side of this is now you can add multiple widgets and have different translations for the day's verse.
 
 == Changelog ==
 
@@ -91,7 +91,7 @@ If you have been using a widget, you will have to re-add the widget to your side
 
 * Complete rewrite.
 * Added option to select default Bible version/translation.
-* Added option to add versions/translations from BibleGateway.com that are not bundled with the plugin (all English versions available at the time of this release are bundled; however, you can easily add more versions from the options page).
+* Added option to add versions/translations from BibleGateway.com that are not bundled with the plugin (all English translations available at the time of this release are bundled; however, you can easily add more translations from the options page).
 * Added internal documentation for clarity.
 * Added filter for themes or other plugins to modify available translations.
 * Added filter for themes or other plugins to modify the final output for the verse.

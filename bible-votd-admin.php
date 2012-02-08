@@ -23,6 +23,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			add_filter( 'plugin_action_links_' . str_replace( '-admin', '', plugin_basename( __FILE__ ) ), array( &$this, 'add_plugin_page_settings_link' ) );
 			add_action( 'admin_menu', array( &$this, 'add_admin_menu' ) );
 			add_action( 'admin_init', array( &$this, 'settings_init' ) );
+			register_uninstall_hook( __FILE__, array( &$this, 'uninstall_plugin' ) );
 		}
 
 		/**
@@ -120,12 +121,12 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			register_setting( 'dz_biblevotd_options', dz_biblegateway_votd::option_name, array( &$this, 'settings_validation' ) );
 
 			add_settings_section( 'biblevotd_options_general', 'General', create_function( '', '' ), 'dz_biblevotd_options_sections' );
-			add_settings_field( dz_biblegateway_votd::option_name . '[default-version]', 'Default Version', array( &$this, 'setting_field_default_version' ), 'dz_biblevotd_options_sections', 'biblevotd_options_general' );
+			add_settings_field( dz_biblegateway_votd::option_name . '[default-version]', 'Default Version', array( &$this, 'setting_field_default_version' ), 'dz_biblevotd_options_sections', 'biblevotd_options_general', array( 'label_for' => 'default-version' ) );
+			add_settings_field( dz_biblegateway_votd::option_name . '[embed-method]', 'Embed Method', array( &$this, 'setting_field_embed_method' ), 'dz_biblevotd_options_sections', 'biblevotd_options_general', array( 'label_for' => 'embed-method' ) );
+			add_settings_field( dz_biblegateway_votd::option_name . '[cache-versions]', 'Cache Versions', array( &$this, 'setting_field_cache_versions' ), 'dz_biblevotd_options_sections', 'biblevotd_options_general', array( 'label_for' => 'cache-versions' ) );
 
 			add_settings_section( 'biblevotd_options_advance', 'Advance', create_function( '', '' ), 'dz_biblevotd_options_sections' );
 			add_settings_field( dz_biblegateway_votd::option_name . '[extra-versions]', 'Additional Versions', array( &$this, 'setting_field_extra_versions' ), 'dz_biblevotd_options_sections', 'biblevotd_options_advance', array( 'label_for' => 'extra_versions' ) );
-
-			//!TODO: Add setting for caching. Also need cron and plugin (de-)activation hooks.
 		}
 
 		/**
@@ -270,6 +271,30 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 <textarea name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[extra-versions]' ); ?>" rows="10" cols="50" id="extra_versions" class="large-text code"><?php echo esc_attr( rtrim( $versions, "\n" ) ); ?></textarea>
 <span class="description">You can manually add extra versions available from BibleGateway.com. Enter one version per line in the format: <code>ABBREVIATION,Full Name</code>.</span>
 <?php
+		}
+
+		public function setting_field_embed_method() {
+
+
+		}
+
+		public function setting_field_cache_versions() {
+
+		}
+
+		/**
+		 * uninstall_plugin function.
+		 *
+		 * Removes all options.
+		 *
+		 * @access public
+		 * @see self::update_check()
+		 * @return void
+		 */
+		public function uninstall_plugin() {
+			foreach( array( 'dz_biblevotd', 'biblegateway_votd', dz_biblegateway_votd::option_name ) as $option ) {
+				delete_option( $option );
+			}
 		}
 
 	}
