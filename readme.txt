@@ -6,24 +6,27 @@ Requires at least: 3.3
 Tested up to: 3.3.1
 Stable tag: 2.3
 
-Adds BibleGateway.com's verse of the day as a sidebar widget, or on page or post.
+Adds BibleGateway.com's verse of the day as a sidebar widget, or on a page or post.
 
 == Description ==
 
-Adds [BibleGateway.com](http://www.biblegateway.com/)'s verse of the day as a sidebar widget or inside a page or post using a the shortcode `[biblevotd]`. Different Bible translations can be selected from the widget's page or as options in the shortcode.
+Adds [BibleGateway.com](http://www.biblegateway.com/)'s verse of the day as a sidebar widget, or inside a page or post using the shortcode `[biblevotd]`. Different Bible translations can be selected from the widget's page or as options in the shortcode.
 
 The plugin defaults to using the NIV translation. You can specify other translations in the widget settings or with the "version" option in the shortcode. For example, to use the KJV in a page or post, write:
 
 `[bible-votd version="KJV"]`
 
-Please note the usage for the shortcode has changed. In previous versions the shortcode was `[bible-votd]` and now it is `[biblevotd]`. Additionally, specifying a version used to be done with the `ver` option and is now done with the `version` option.
+Version 3.0 of this plugin is a complete rewrite. It leverages several new methods for retrieving the verse to prevent any delays when visitors load your site. The plugin will attempt to retrieve and cache the verse once daily. If it is available it will directly serve the cache. If it is not, it will fallback to using the jQuery JavaScript library. This allows the JavaScript code necessary to insert the verse to not execute until the entire page on your site has finished loading (allowing your site load uninterrupted, regardless of any delays from BibleGateway.com).
+
+Because of the unique nature of this plugin, you can insert multiple verses of the day (in different translations) across your web site. Something the code BibleGateway.com provides cannot do!
 
 == Installation ==
 
 1. Upload the `biblegateway-votd` folder to the `/wp-content/plugins/` directory.
 2. Activate the plugin in the 'Plugins' page in WordPress.
-3. Add the Bible VOTD widget to your sidebar. Or,
-4. Type `[bible-votd]` in the page or post content where you want the verse to appear.
+3. Optionally set your defaults from the settings page.
+4. Add the Bible VOTD widget to your sidebar. Or,
+5. Type `[bible-votd]` in the page or post content where you want the verse to appear.
 
 == Frequently Asked Questions ==
 
@@ -52,23 +55,43 @@ Please note the usage for the shortcode has changed. In previous versions the sh
 
 = What if I want a version not listed? =
 
-BibleGateway.com has a list of available versions for their verse of the day. You can view that page to find the version you want. Additional versions can be added from the plugin's setting page, then used by the shortcode or widget. If BibleGateway makes it available, you can add it and use it!
+BibleGateway.com [has a list](http://www.biblegateway.com/usage/votd/custom_votd.php) of available versions for their verse of the day. You can view that page to find the version you want. Additional versions can be added from the plugin's settings page, then used by the shortcode or widget. If BibleGateway makes it available, you can add it and use it!
 
 = I want to format the way the verse appears on my site. How can I do that? =
 
-The plugin will wrap the verse in a CSS class named `biblevotd`. You can use that to add CSS instructions to your theme's style.css file to provide specific formatting. If you want to use a class name other than "biblevotd" you can simply pass `class="classname"` as an option when using the shortcode (for example, `[biblevotd class="dailyverse"]`). Widgets are automatically provided with additional CSS class names by WordPress and can be uniquely formatted using those.
+The plugin will wrap the verse in a CSS class named `biblevotd`. You can use that to add CSS instructions to your theme's style.css file to provide specific formatting. If you want to use a class name other than "biblevotd" you can simply pass `class="classname"` as an option when using the shortcode (for example, `[bible-votd class="dailyverse"]`). Widgets are automatically provided with additional CSS class names by WordPress and can be uniquely formatted using those.
+
+= I need more than just CSS to change the way the verse appears. What can I do? =
+
+Directly before printing the verse code the plugin passes the information through the `pre_dz_biblegateway_verse` filter. You can add code to your theme's functions.php file to hook into this filter and update the content accordingly. Be aware that sometimes the content will be the verse (if it was cached), or JavaScript (if using jQuery).
 
 = Why does using the plugin cause page load times to increase? =
 
-This issue is common when inserting content from another site (e.g. BibleGateway.com, Twitter.com, etc.). The delay is caused when BibleGateway.com is slow to provide the verse; as a result, your page halts until BibleGateway.com either responds or times out. By default the plugin works around this issue, so you should not experience any delays. If you are, make sure you are using the `jQuery` or `Cache` methods for inserting the verse. These methods can be selected from the Bible VOTD settings page and allow your web site page to load without being slowed down by using enhanced JavaScript loading or advanced caching techniques.
+This issue is common when inserting content from another site (e.g. BibleGateway.com, Twitter.com, etc.). The delay is caused when BibleGateway.com is slow to provide the verse; as a result, your page halts until BibleGateway.com either responds or times out. As of version 3.0 the plugin will by default work around this issue, so you should not experience any delays. If you are, make sure you are using the jQuery or Cache methods for inserting the verse. These methods can be selected from the Bible VOTD settings page and allow your web site page to load without being slowed down by using enhanced JavaScript loading or advanced caching techniques.
+
+= Which method should I use: Cache, jQuery, or Basic? =
+
+You should Cache; it is the default setting. The plugin is intelligent in that it will continue to fallback to the next method, in order. Selecting Cache will give your site the best opportunity to provide the verse of the day without delays in page loading.
+
+The only time you should jQuery is if your web server is not able to fetch remote URLs. How do you know if it can? Simple: If you are able to update plugins, themes, and the WordPress core from within WordPress without issue, you can fetch remote URLs. If you cannot, you should really look into fixing that. :) But also, you should select jQuery as the method because there's no sense in your web server trying to cache something all the time when it is simply not able to.
+
+The Basic method should only be used if Cache and jQuery are not working. It uses the identical code provided by BibleGateway.com to insert the verse. This has limitations: It can slow page loading if BibleGateway.com is running slow. Additionally, it limits the number of verses of the day you can include on a page to one. The Basic method is only provided in case BibleGateway.com significantly alters their delivery scheme and that results in the other two methods breaking. Switching to Basic should allow you to continue to use the plugin until it is updated.
+
+== Upgrade Notice ==
+
+A complete rewrite of the plugin. Please see the Changelog for full details.
+
+Note the usage for the shortcode has changed. In previous versions the shortcode was `[bible-votd]` and now it is `[biblevotd]`. Additionally, specifying a version used to be done with the `ver` option and is now done with the `version` option. For example, to print the King James Version using the shortcode you previous typed `[bible-votd ver="9"]`. Now you type `[biblevotd version="KJV"]`.
+
+If you have been using a widget, you will have to re-add the widget to your sidebar(s) after updating. This is necessary due to a significant change in the underlying code. However, the positive side of this is now you can add multiple widgets and have different versions for the day's verse.
 
 == Changelog ==
 
 = 3.0 =
 
-* Complete rewrite. If you have been using this plugin as a widget, you will have to re-add the widget to your sidebar(s) after updating.
+* Complete rewrite.
 * Added option to select default Bible version/translation.
-* Added option to add versions/translations from BibleGateway.com that are not bundled with the plugin (all English versions available at the time of this release are bundled; however, you can easily add more versions from the Options page).
+* Added option to add versions/translations from BibleGateway.com that are not bundled with the plugin (all English versions available at the time of this release are bundled; however, you can easily add more versions from the options page).
 * Added internal documentation for clarity.
 * Added filter for themes or other plugins to modify available translations.
 * Added filter for themes or other plugins to modify the final output for the verse.
