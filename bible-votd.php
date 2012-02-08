@@ -39,6 +39,13 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 	class dz_biblegateway_votd {
 
 		/**
+		 * version
+		 *
+		 * Holds the current version of this plugin.
+		 */
+		const version = 3.0;
+
+		/**
 		 * instances
 		 *
 		 * Stores an array of all instances of the verse of the day used on a page load.

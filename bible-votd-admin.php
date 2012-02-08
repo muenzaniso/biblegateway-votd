@@ -19,9 +19,66 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		 * @return void
 		 */
 		public function __construct() {
+			add_action( 'admin_init', array( &$this, 'update_check' ) );
 			add_filter( 'plugin_action_links_' . str_replace( '-admin', '', plugin_basename( __FILE__ ) ), array( &$this, 'add_plugin_page_settings_link' ) );
 			add_action( 'admin_menu', array( &$this, 'add_admin_menu' ) );
 			add_action( 'admin_init', array( &$this, 'settings_init' ) );
+		}
+
+		/**
+		 * update_check function.
+		 *
+		 * Updates the options from previous versions so everything works.
+		 *
+		 * @access public
+		 * @return void
+		 */
+		public function update_check() {
+			$options = get_option( dz_biblegateway_votd::option_name );
+			if ( !$options || empty( $options['version'] ) || version_compare( dz_biblegateway_votd::version, $options['version'], '>' ) ) {
+
+				// The latest defaults, which are also defined in {@link self::settings_validation()}.
+
+				$new = array(
+					'version' => dz_biblegateway_votd::version,
+					'default-version' => 'NIV',
+					'extra-versions' => array()
+					);
+
+				// Version 1.
+
+				if ( get_option( 'dz_biblevotd' ) ) {
+					$options = maybe_unserialize( get_option( 'dz_biblevotd', array() ) );
+					$options = array_merge( (array) $options, array( 'ver' => 31 ) );
+
+					add_option( 'biblegateway_votd', $options, '', 'no' );
+					delete_option( 'dz_biblevotd' );
+				}
+
+				// Version 2.
+
+				if ( $options = get_option( 'biblegateway_votd' ) ) {
+					$versions_diff = array(
+						31 => 'NIV',
+						49 => 'NASB',
+						45 => 'AMP',
+						9 => 'KJV',
+						47 => 'ESV',
+						8 => 'ASV',
+						15 => 'YLT',
+						16 => 'DARBY',
+						76 => 'NIRV',
+						64 => 'NIVUK',
+						72 => 'TNIV'
+						);
+
+					if ( !empty( $options['ver'] ) && array_key_exists( $options['ver'], $versions_diff ) )
+						$new['default-version'] = $versions_diff[$options['ver']];
+
+					update_option( dz_biblegateway_votd::option_name, $new );
+					delete_option( 'biblegateway_votd' );
+				}
+			}
 		}
 
 		/**
@@ -119,10 +176,11 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		 */
 		public function settings_validation( $input ) {
 
-			// Get existing and default settings.
+			// Get existing and default settings, also see {@link self::update_check()}.
 
-			$options = get_option( dz_biblegateway_votd::option_name );
+			$options = (array) get_option( dz_biblegateway_votd::option_name, array() );
 			$options = wp_parse_args( $options, array(
+				'version' => dz_biblegateway_votd::version,
 				'default-version' => 'NIV',
 				'extra-versions' => array()
 				) );
