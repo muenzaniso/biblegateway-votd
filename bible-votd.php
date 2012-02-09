@@ -208,7 +208,7 @@ jQuery(document).ready(function(b){var a=<?php echo json_encode( $this->instance
 			$cache = get_transient( self::transient_name );
 
 			end( $this->instances );
-			$version = $this->instances[key( $this->instances )];
+			$version = current( $this->instances );
 
 			if ( isset( $cache[$version] ) )
 				return $cache[$version];
