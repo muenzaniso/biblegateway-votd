@@ -272,7 +272,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		 * @see dz_biblegateway_votd::bible_votd_code_helper()
 		 * @return void
 		 */
-		public function setting_field_cache_versions() {
+		public function setting_field_embed_method() {
 			$methods = array(
 				'cache' => 'Cache',
 				'jquery' => 'jQuery',
