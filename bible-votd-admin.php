@@ -33,7 +33,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		 * @access public
 		 * @return void
 		 */
-		public function update_check() {
+		public function update_check() { return; //!TODO: Debug this. It doesn't work properly.
 			$options = get_option( dz_biblegateway_votd::option_name );
 			if ( !$options || empty( $options['version'] ) || version_compare( dz_biblegateway_votd::version, $options['version'], '>' ) ) {
 
@@ -42,6 +42,8 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 				$new = array(
 					'version' => dz_biblegateway_votd::version,
 					'default-version' => 'NIV',
+					'embed-method' => 'cache',
+					'cache-versions' => array(),
 					'extra-versions' => array()
 					);
 
@@ -125,7 +127,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			add_settings_field( dz_biblegateway_votd::option_name . '[cache-versions]', 'Cache Versions', array( &$this, 'setting_field_cache_versions' ), 'dz_biblevotd_options_sections', 'biblevotd_options_general', array( 'label_for' => 'cache-versions' ) );
 
 			add_settings_section( 'biblevotd_options_advance', 'Advance', create_function( '', '' ), 'dz_biblevotd_options_sections' );
-			add_settings_field( dz_biblegateway_votd::option_name . '[extra-versions]', 'Additional Versions', array( &$this, 'setting_field_extra_versions' ), 'dz_biblevotd_options_sections', 'biblevotd_options_advance', array( 'label_for' => 'extra_versions' ) );
+			add_settings_field( dz_biblegateway_votd::option_name . '[extra-versions]', 'Additional Versions', array( &$this, 'setting_field_extra_versions' ), 'dz_biblevotd_options_sections', 'biblevotd_options_advance', array( 'label_for' => 'extra-versions' ) );
 		}
 
 		/**
@@ -182,6 +184,8 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			$options = wp_parse_args( $options, array(
 				'version' => dz_biblegateway_votd::version,
 				'default-version' => 'NIV',
+				'embed-method' => 'cache',
+				'cache-versions' => array(),
 				'extra-versions' => array()
 				) );
 
@@ -189,6 +193,15 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 
 			if ( $valid = dz_biblegateway_votd::is_version_available( $input['default-version'] ) )
 				$options['default-version'] = $valid;
+
+			// Validate the embed method.
+
+			if ( in_array( $input['embed-method'], array( 'cache', 'jquery', 'basic' ) ) )
+				$options['embed-method'] = $input['embed-method'];
+
+			// Validate cache versions.
+
+			$options['cache-versions'] = array_intersect( (array) $input['cache-versions'], array_keys( dz_biblegateway_votd::get_available_versions() ) );
 
 			// Validate extra versions.
 
@@ -238,7 +251,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			$options = get_option( dz_biblegateway_votd::option_name );
 			$default = ( isset( $options['default-version'] ) ) ? $options['default-version'] : 'NIV';
 ?>
-<select name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[default-version]' ); ?>">
+<select name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[default-version]' ); ?>" id="default-version">
 <?php
 			foreach ( $versions as $abbr => $desc ) {
 				$selected = selected( $abbr, $default, false );
@@ -247,6 +260,73 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 ?>
 </select>
 <?php
+		}
+
+		/**
+		 * setting_field_embed_method function.
+		 *
+		 * Provides a drop down menu of options that control how the plugin will insert the
+		 * verse into the page.
+		 *
+		 * @access public
+		 * @see dz_biblegateway_votd::bible_votd_code_helper()
+		 * @return void
+		 */
+		public function setting_field_embed_method() {
+			$methods = array(
+				'cache' => 'Cache',
+				'jquery' => 'jQuery',
+				'basic' => 'Basic'
+				);
+
+			$options = get_option( dz_biblegateway_votd::option_name );
+			$default = ( isset( $options['embed-method'] ) ) ? $options['embed-method'] : 'cache';
+?>
+<select name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[embed-method]' ); ?>" id="embed-method">
+<?php
+			foreach ( $methods as $abbr => $desc ) {
+				$selected = selected( $abbr, $default, false );
+				printf ( "\t<option value='%1\$s'%2\$s>%3\$s</option>\n", esc_attr( $abbr ), $selected, esc_attr( $desc ) );
+			}
+?>
+</select>
+<?php
+		}
+
+		/**
+		 * setting_field_cache_versions function.
+		 *
+		 * Provides a multiple selection box of versions to cache.
+		 *
+		 * @access public
+		 * @return void
+		 */
+		public function setting_field_cache_versions() {
+			$versions = dz_biblegateway_votd::get_available_versions();
+
+			$options = get_option( dz_biblegateway_votd::option_name );
+			$selections = ( isset( $options['cache-versions'] ) ) ? $options['cache-versions'] : array();
+?>
+<select name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[cache-versions][]' ); ?>" id="cache-versions" multiple size="8">
+<?php
+			foreach ( $versions as $abbr => $desc ) {
+				$selected = selected( in_array( $abbr, $selections ), true, false );
+				printf ( "\t<option value='%1\$s'%2\$s>%3\$s</option>\n", esc_attr( $abbr ), $selected, esc_attr( $desc ) );
+			}
+?>
+</select>
+<span class="description">Hold the Command key (Mac) or the Control key (others) to select multiple versions. Versions selected here will be cached once daily by WordPress to prevent page loading delays when display the verse (Embed Method above must be set to <code>Cache</code>).
+<?php
+			if ( $next = wp_next_scheduled( 'ZZZZ_NOT_SET' ) ) : //!TODO: Set schedule hook.
+?>
+<br />
+<span>
+	<?php
+				printf( 'Next caching is on: <code>%s</code>.', date_i18n( _x( 'Y-m-d G:i:s', 'timezone date format' ), $next ) );
+?>
+</span>
+<?php
+			endif;
 		}
 
 		/**
@@ -267,18 +347,9 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 				}
 			}
 ?>
-<textarea name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[extra-versions]' ); ?>" rows="10" cols="50" id="extra_versions" class="large-text code"><?php echo esc_attr( rtrim( $versions, "\n" ) ); ?></textarea>
+<textarea name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[extra-versions]' ); ?>" rows="10" cols="50" id="extra-versions" class="large-text code"><?php echo esc_attr( rtrim( $versions, "\n" ) ); ?></textarea>
 <span class="description">You can manually add extra versions available from BibleGateway.com. Enter one version per line in the format: <code>ABBREVIATION,Full Name</code>.</span>
 <?php
-		}
-
-		public function setting_field_embed_method() {
-
-
-		}
-
-		public function setting_field_cache_versions() {
-
 		}
 
 	}
