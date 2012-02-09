@@ -13,6 +13,20 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 	class dz_biblegateway_votd_admin {
 
 		/**
+		 * cron_name
+		 *
+		 * The name of the cron action hook.
+		 */
+		const cron_name = 'dz_biblegateway_fetch';
+
+		/**
+		 * bg_api_url
+		 *
+		 * The BibleGateway.com API URI. Sprintf-ready--%1$s is the version abbreviation.
+		 */
+		const bg_api_uri = 'http://www.biblegateway.com/votd/get/?format=json&version=%1$s';
+
+		/**
 		 * __construct function.
 		 *
 		 * @access public
@@ -23,6 +37,13 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			add_filter( 'plugin_action_links_' . str_replace( '-admin', '', plugin_basename( __FILE__ ) ), array( &$this, 'add_plugin_page_settings_link' ) );
 			add_action( 'admin_menu', array( &$this, 'add_admin_menu' ) );
 			add_action( 'admin_init', array( &$this, 'settings_init' ) );
+
+			add_action( self::cron_name, array( &$this, 'cache_verses' ) );
+
+			// (De-)activation hooks.
+
+			register_activation_hook( __FILE__, array( &$this, 'schedule_fetch' ) );
+			register_deactivation_hook( __FILE__, array( &$this, 'unschedule_fetch' ) );
 		}
 
 		/**
@@ -317,7 +338,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 </select>
 <span class="description">Hold the Command key (Mac) or the Control key (others) to select multiple versions. Versions selected here will be cached once daily by WordPress to prevent page loading delays when display the verse (Embed Method above must be set to <code>Cache</code>).
 <?php
-			if ( $next = wp_next_scheduled( 'ZZZZ_NOT_SET' ) ) : //!TODO: Set schedule hook.
+			if ( $next = wp_next_scheduled( self::cron_name ) ) :
 ?>
 <br />
 <span>
@@ -350,6 +371,113 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 <textarea name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[extra-versions]' ); ?>" rows="10" cols="50" id="extra-versions" class="large-text code"><?php echo esc_attr( rtrim( $versions, "\n" ) ); ?></textarea>
 <span class="description">You can manually add extra versions available from BibleGateway.com. Enter one version per line in the format: <code>ABBREVIATION,Full Name</code>.</span>
 <?php
+		}
+
+		private function remote_get_json_helper( $json ) {
+		
+		
+		
+		
+		}
+
+
+
+		/**
+		 * get_next_fetch_time function.
+		 * 
+		 * Returns a Unix timestamp for the next fetch.
+		 *
+		 * This function first checks the cache. If it is empty, it returns a time 10-minutes from now.
+		 * Otherwise it returns a time for the next day (6:01 AM UTC or 1:01 AM EST).
+		 *
+		 * @access private
+		 * @return int
+		 */
+		private function get_next_fetch_time() {
+			if ( !get_transient( dz_biblegateway_votd::transient_name ) )
+				return time() + 600;
+
+			return mktime( 6, 0, 1, date( 'n' ), date( 'j' ) + 1 );
+		}
+
+		/**
+		 * cache_verses function.
+		 *
+		 * The main handler for fetching the verses and storing them using the WordPress Transient API.
+		 *
+		 * @access public
+		 * @uses wp_remote_get()
+		 * @uses wp_remote_retrieve_response_code()
+		 * @uses wp_remote_retrieve_body()
+		 * @uses self::remote_get_json_helper()
+		 * @uses self::get_next_flush_time()
+		 * @return void
+		 */
+		public function cache_verses() {
+		
+			// Get the versions to cache.
+			
+			$options = get_option( dz_biblegateway_votd::option_name );
+			$versions = ( isset( $options['cache-versions'] ) ) ? $options['cache-versions'] : array();
+
+			// Clear the existing cache.
+
+			delete_transient( dz_biblegateway_votd::transient_name );
+
+			// Fetch each version.
+
+			$cache = array();
+			foreach ( $versions as $version ) {
+				$resp = wp_remote_get( sprintf( bg_api_uri, $version ) );
+				
+				if ( 200 != wp_remote_retrieve_response_code( $resp ) )
+					continue;
+				
+				$body = wp_remote_retrieve_body( $resp );
+				
+				$verse = $this->remote_get_json_helper( $body );
+				
+				if ( false !== $verse )
+					$cache[$version] = $verse;
+			}
+
+			// If versions were fetch, store them as a transient.
+
+			if ( !empty( $cache ) )
+				set_transient( dz_biblegateway_votd::transient_name, $cache, ( $this->get_next_fetch_time() - 60 ) );
+
+			// Schedule next fetch.
+
+			$this->schedule_fetch();
+		}
+
+		/**
+		 * schedule_fetch function.
+		 *
+		 * Schedules a cron job to fetch the verses once daily. If the cron job is already scheduled then
+		 * this does nothing.
+		 *
+		 * @access public
+		 * @uses self::get_next_fetch_time()
+		 * @return void
+		 */
+		public function schedule_fetch() {
+			$options = get_option( dz_biblegateway_votd::option_name );
+		
+			if ( !empty( $options['cache-versions'] ) && !wp_next_scheduled( self::cron_name ) )
+				wp_schedule_single_event( $this->get_next_fetch_time(), self::cron_name );
+		}
+
+		/**
+		 * unschedule_fetch function.
+		 *
+		 * Unschedules the cron job to fetch the verses.
+		 *
+		 * @access public
+		 * @return void
+		 */
+		public function unschedule_fetch() {
+			wp_clear_scheduled_hook( self::cron_name );
 		}
 
 	}
