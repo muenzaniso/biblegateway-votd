@@ -109,7 +109,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * @uses get_option()
 		 * @return array Associative array of available translations with keys of abbreviations and values of full names.
 		 */
-		static public function get_available_versions() {
+		public static function get_available_versions() {
 			static $versions = array();
 
 			if ( empty( $versions ) ) {
@@ -161,7 +161,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 * @param string $version Version to check.
 		 * @return string|bool The abbreviation as a string if the version is available, otherwise false.
 		 */
-		static public function is_version_available( $version ) {
+		public static function is_version_available( $version ) {
 			$available = self::get_available_versions();
 
 			// Check if it is an abbreviation.

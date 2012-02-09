@@ -23,7 +23,6 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			add_filter( 'plugin_action_links_' . str_replace( '-admin', '', plugin_basename( __FILE__ ) ), array( &$this, 'add_plugin_page_settings_link' ) );
 			add_action( 'admin_menu', array( &$this, 'add_admin_menu' ) );
 			add_action( 'admin_init', array( &$this, 'settings_init' ) );
-			register_uninstall_hook( __FILE__, array( &$this, 'uninstall_plugin' ) );
 		}
 
 		/**
@@ -280,21 +279,6 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 
 		public function setting_field_cache_versions() {
 
-		}
-
-		/**
-		 * uninstall_plugin function.
-		 *
-		 * Removes all options.
-		 *
-		 * @access public
-		 * @see self::update_check()
-		 * @return void
-		 */
-		public function uninstall_plugin() {
-			foreach( array( 'dz_biblevotd', 'biblegateway_votd', dz_biblegateway_votd::option_name ) as $option ) {
-				delete_option( $option );
-			}
 		}
 
 	}
