@@ -373,28 +373,87 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 <?php
 		}
 
+		/**
+		 * remote_get_json_helper function.
+		 *
+		 * Processes the JSON request. Checks to make sure the verse is for the proper date,
+		 * then extracts the necessary verse information from request response and builds the
+		 * verse for printing.
+		 *
+		 * @access private
+		 * @param array $json
+		 * @return bool|array A boolean false if nothing could be parsed. An associative array containing the filtered verse and raw JSON request.
+		 */
 		private function remote_get_json_helper( $json ) {
-		
-		
-		
-		
+
+/*
+
+{"votd":{"text":"&ldquo;[Thanksgiving and Prayer]  We ought always to thank God for you, brothers and sisters, and rightly so, because your faith is growing more and more, and the love all of you have for one another is increasing.&rdquo;",
+"display_ref":"2 Thessalonians 1:3",
+"reference":"2 Thessalonians 1:3",
+"permalink":"http:\/\/www.biblegateway.com\/passage\/?version=NIV&amp;search=2 Thessalonians 1:3",
+"copyright":"Copyright &#169;  1973, 1978, 1984, 2011 by Biblica",
+"copyrightlink":"http:\/\/www.biblegateway.com\/versions\/index.php?action=getVersionInfo&amp;vid=31&amp;lang=2",
+"audiolink":"http:\/\/www.biblegateway.com\/audio\/mclean\/niv\/2Thess.1.3",
+"day":"09",
+"month":"02",
+"year":"2012",
+"version":"New International Version",
+"version_id":"NIV"}}
+*/
+/*
+html(e.text+
+' &#8212; <a href="'+
+e.permalink+
+'">'+
+e.reference+
+"</a>."+
+("undefined"!=typeof e.audiolink?' <a href="'+
+e.audiolink+
+'" title="Listen to chapter"><img width="13" height="12" src="http://www.biblegateway.com/resources/audio/images/sound.gif" alt="Listen to chapter" /></a>':"")+
+' <a href="'+
+e.copyrightlink+
+'">'+
+e.copyright+
+'</a>. Powered by <a href="http://www.biblegateway.com/">BibleGateway.com</a>.');});});});
+*/
+
+			$json = json_decode( $json );
+
+			// BibleGateway.com returns the request nested in another array. Move it up.
+
+			if ( 1 == count( $json ) && is_array( current( $json ) )
+				$json = current( $json );
+
+			// Is this a new day?
+
+			if ( date( 'Ymd' ) != $json['year'] . $json['month'] . $json['day'] )
+				return false;
+
+			// Build the verse.
+
+
+
+
+
+			return false;
 		}
-
-
 
 		/**
 		 * get_next_fetch_time function.
-		 * 
+		 *
 		 * Returns a Unix timestamp for the next fetch.
 		 *
 		 * This function first checks the cache. If it is empty, it returns a time 10-minutes from now.
 		 * Otherwise it returns a time for the next day (6:01 AM UTC or 1:01 AM EST).
 		 *
 		 * @access private
+		 * @uses get_transient()
+		 * @param bool $force If true, forces the next day time even if the cache is empty.
 		 * @return int
 		 */
-		private function get_next_fetch_time() {
-			if ( !get_transient( dz_biblegateway_votd::transient_name ) )
+		private function get_next_fetch_time( $force = false ) {
+			if ( !$force && !get_transient( dz_biblegateway_votd::transient_name ) )
 				return time() + 600;
 
 			return mktime( 6, 0, 1, date( 'n' ), date( 'j' ) + 1 );
@@ -414,9 +473,9 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		 * @return void
 		 */
 		public function cache_verses() {
-		
+
 			// Get the versions to cache.
-			
+
 			$options = get_option( dz_biblegateway_votd::option_name );
 			$versions = ( isset( $options['cache-versions'] ) ) ? $options['cache-versions'] : array();
 
@@ -429,14 +488,14 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			$cache = array();
 			foreach ( $versions as $version ) {
 				$resp = wp_remote_get( sprintf( bg_api_uri, $version ) );
-				
+
 				if ( 200 != wp_remote_retrieve_response_code( $resp ) )
 					continue;
-				
+
 				$body = wp_remote_retrieve_body( $resp );
-				
+
 				$verse = $this->remote_get_json_helper( $body );
-				
+
 				if ( false !== $verse )
 					$cache[$version] = $verse;
 			}
@@ -444,7 +503,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			// If versions were fetch, store them as a transient.
 
 			if ( !empty( $cache ) )
-				set_transient( dz_biblegateway_votd::transient_name, $cache, ( $this->get_next_fetch_time() - 60 ) );
+				set_transient( dz_biblegateway_votd::transient_name, $cache, ( $this->get_next_fetch_time( true ) - 60 ) );
 
 			// Schedule next fetch.
 
@@ -458,12 +517,14 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		 * this does nothing.
 		 *
 		 * @access public
+		 * @uses wp_next_scheduled()
+		 * @uses wp_schedule_single_event()
 		 * @uses self::get_next_fetch_time()
 		 * @return void
 		 */
 		public function schedule_fetch() {
 			$options = get_option( dz_biblegateway_votd::option_name );
-		
+
 			if ( !empty( $options['cache-versions'] ) && !wp_next_scheduled( self::cron_name ) )
 				wp_schedule_single_event( $this->get_next_fetch_time(), self::cron_name );
 		}
@@ -474,6 +535,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		 * Unschedules the cron job to fetch the verses.
 		 *
 		 * @access public
+		 * @uses wp_clear_scheduled_hook()
 		 * @return void
 		 */
 		public function unschedule_fetch() {
