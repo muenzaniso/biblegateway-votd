@@ -422,7 +422,7 @@ e.copyright+
 
 			// BibleGateway.com returns the request nested in another array. Move it up.
 
-			if ( 1 == count( $json ) && is_array( current( $json ) )
+			if ( 1 == count( $json ) && is_array( current( $json ) ) )
 				$json = current( $json );
 
 			// Is this a new day?
