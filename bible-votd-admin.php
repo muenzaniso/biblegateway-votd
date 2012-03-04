@@ -78,7 +78,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		public function update_check() {
 			$options = (array) get_option( dz_biblegateway_votd::option_name, array() );
 
-			if ( !$options || empty( $options['version'] ) || version_compare( dz_biblegateway_votd::version, $options['version'], '>' ) ) {
+			if ( empty( $options ) || empty( $options['version'] ) || version_compare( dz_biblegateway_votd::version, $options['version'], '>' ) ) {
 
 				// The latest defaults, which are also used in {@link self::settings_validation()}.
 
