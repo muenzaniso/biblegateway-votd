@@ -37,13 +37,33 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			add_filter( 'plugin_action_links_' . str_replace( '-admin', '', plugin_basename( __FILE__ ) ), array( &$this, 'add_plugin_page_settings_link' ) );
 			add_action( 'admin_menu', array( &$this, 'add_admin_menu' ) );
 			add_action( 'admin_init', array( &$this, 'settings_init' ) );
+			add_action( 'add_option_' . dz_biblegateway_votd::transient_name, array( &$this, 'add_transient_option' ) );
+
+			// Cron hooks.
 
 			add_action( self::cron_name, array( &$this, 'cache_verses' ) );
-
-			// (De-)activation hooks.
-
 			register_activation_hook( __FILE__, array( &$this, 'schedule_fetch' ) );
 			register_deactivation_hook( __FILE__, array( &$this, 'unschedule_fetch' ) );
+			add_action( 'add_option_' . dz_biblegateway_votd::option_name, array( &$this, 'schedule_fetch' ) );
+			add_action( 'update_option_' . dz_biblegateway_votd::option_name, array( &$this, 'schedule_fetch' ) );
+		}
+
+		/**
+		 * default_plugin_options function.
+		 *
+		 * A single place to find the default settings for the plugin.
+		 *
+		 * @access private
+		 * @return void
+		 */
+		private function default_plugin_options() {
+			return array(
+				'version' => dz_biblegateway_votd::version,
+				'default-version' => 'NIV',
+				'embed-method' => 'cache',
+				'cache-versions' => array(),
+				'extra-versions' => array()
+				);
 		}
 
 		/**
@@ -52,21 +72,17 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		 * Updates the options from previous versions so everything works.
 		 *
 		 * @access public
+		 * @uses self::default_plugin_options()
 		 * @return void
 		 */
-		public function update_check() { return; //!TODO: Debug this. It doesn't work properly.
-			$options = get_option( dz_biblegateway_votd::option_name );
+		public function update_check() {
+			$options = (array) get_option( dz_biblegateway_votd::option_name, array() );
+
 			if ( !$options || empty( $options['version'] ) || version_compare( dz_biblegateway_votd::version, $options['version'], '>' ) ) {
 
-				// The latest defaults, which are also defined in {@link self::settings_validation()}.
+				// The latest defaults, which are also used in {@link self::settings_validation()}.
 
-				$new = array(
-					'version' => dz_biblegateway_votd::version,
-					'default-version' => 'NIV',
-					'embed-method' => 'cache',
-					'cache-versions' => array(),
-					'extra-versions' => array()
-					);
+				$new = wp_parse_args( $options, $this->default_plugin_options() );
 
 				// Version 1.
 
@@ -74,8 +90,8 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 					$options = maybe_unserialize( get_option( 'dz_biblevotd', array() ) );
 					$options = array_merge( (array) $options, array( 'ver' => 31 ) );
 
-					add_option( 'biblegateway_votd', $options, '', 'no' );
 					delete_option( 'dz_biblevotd' );
+					add_option( 'biblegateway_votd', $options, '', 'no' );
 				}
 
 				// Version 2.
@@ -98,9 +114,10 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 					if ( !empty( $options['ver'] ) && array_key_exists( $options['ver'], $versions_diff ) )
 						$new['default-version'] = $versions_diff[$options['ver']];
 
-					update_option( dz_biblegateway_votd::option_name, $new );
 					delete_option( 'biblegateway_votd' );
 				}
+
+				update_option( dz_biblegateway_votd::option_name, $new );
 			}
 		}
 
@@ -193,6 +210,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		 * Handles validation for the plugin settings.
 		 *
 		 * @access public
+		 * @uses self::default_plugin_options()
 		 * @see update_option()
 		 * @param mixed $input
 		 * @return void
@@ -202,13 +220,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			// Get existing and default settings, also see {@link self::update_check()}.
 
 			$options = (array) get_option( dz_biblegateway_votd::option_name, array() );
-			$options = wp_parse_args( $options, array(
-				'version' => dz_biblegateway_votd::version,
-				'default-version' => 'NIV',
-				'embed-method' => 'cache',
-				'cache-versions' => array(),
-				'extra-versions' => array()
-				) );
+			$options = wp_parse_args( $options, $this->default_plugin_options() );
 
 			// Validate default version.
 
@@ -222,7 +234,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 
 			// Validate cache versions.
 
-			$options['cache-versions'] = array_intersect( (array) $input['cache-versions'], array_keys( dz_biblegateway_votd::get_available_versions() ) );
+			$options['cache-versions'] = ( empty( $input['cache-versions'] ) ) ? array() : array_intersect( (array) $input['cache-versions'], array_keys( dz_biblegateway_votd::get_available_versions() ) );
 
 			// Validate extra versions.
 
@@ -336,7 +348,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			}
 ?>
 </select>
-<span class="description">Hold the Command key (Mac) or the Control key (others) to select multiple versions. Versions selected here will be cached once daily by WordPress to prevent page loading delays when display the verse (Embed Method above must be set to <code>Cache</code>).
+<span class="description">Hold the Command key (Mac) or the Control key (others) to select multiple versions. Versions selected here will be cached daily by WordPress to prevent page loading delays when display the verse (Embed Method above must be set to <code>Cache</code>).
 <?php
 			if ( $next = wp_next_scheduled( self::cron_name ) ) :
 ?>
@@ -433,30 +445,24 @@ e.copyright+
 			// Build the verse.
 
 
-
-
-
 			return false;
 		}
 
 		/**
-		 * get_next_fetch_time function.
+		 * add_transient_option function.
 		 *
-		 * Returns a Unix timestamp for the next fetch.
+		 * Make sure the transient value autoloads (even though it has an expiration).
 		 *
-		 * This function first checks the cache. If it is empty, it returns a time 10-minutes from now.
-		 * Otherwise it returns a time for the next day (6:01 AM UTC or 1:01 AM EST).
-		 *
-		 * @access private
-		 * @uses get_transient()
-		 * @param bool $force If true, forces the next day time even if the cache is empty.
-		 * @return int
+		 * @access public
+		 * @uses wpdb::update()
+		 * @return void
 		 */
-		private function get_next_fetch_time( $force = false ) {
-			if ( !$force && !get_transient( dz_biblegateway_votd::transient_name ) )
-				return time() + 600;
+		public function add_transient_option() {
+			global $wpdb;
 
-			return mktime( 6, 0, 1, date( 'n' ), date( 'j' ) + 1 );
+			foreach ( array( '_transient_timeout_' . dz_biblegateway_votd::transient_name, '_transient_' . dz_biblegateway_votd::transient_name ) as $option ) {
+				$wpdb->update( $wpdb->options, array( 'autoload' => 'yes' ), array( 'option_name' => $option ) );
+			}
 		}
 
 		/**
@@ -487,7 +493,7 @@ e.copyright+
 
 			$cache = array();
 			foreach ( $versions as $version ) {
-				$resp = wp_remote_get( sprintf( bg_api_uri, $version ) );
+				$resp = wp_remote_get( sprintf( self::bg_api_uri, $version ) );
 
 				if ( 200 != wp_remote_retrieve_response_code( $resp ) )
 					continue;
@@ -500,33 +506,30 @@ e.copyright+
 					$cache[$version] = $verse;
 			}
 
-			// If versions were fetch, store them as a transient.
+			// If versions were fetched, store them as a transient.
 
 			if ( !empty( $cache ) )
-				set_transient( dz_biblegateway_votd::transient_name, $cache, ( $this->get_next_fetch_time( true ) - 60 ) );
-
-			// Schedule next fetch.
-
-			$this->schedule_fetch();
+				set_transient( dz_biblegateway_votd::transient_name, $cache, 86399 );
 		}
 
 		/**
 		 * schedule_fetch function.
 		 *
-		 * Schedules a cron job to fetch the verses once daily. If the cron job is already scheduled then
-		 * this does nothing.
+		 * Schedules a cron job to fetch the verses twice daily. If the cron job is already scheduled it
+		 * will be cleared. If there are no versions are set to be cached then this does nothing.
 		 *
 		 * @access public
-		 * @uses wp_next_scheduled()
-		 * @uses wp_schedule_single_event()
-		 * @uses self::get_next_fetch_time()
+		 * @uses self::unschedule_fetch()
+		 * @uses wp_schedule_event()
 		 * @return void
 		 */
 		public function schedule_fetch() {
 			$options = get_option( dz_biblegateway_votd::option_name );
 
-			if ( !empty( $options['cache-versions'] ) && !wp_next_scheduled( self::cron_name ) )
-				wp_schedule_single_event( $this->get_next_fetch_time(), self::cron_name );
+			$this->unschedule_fetch();
+
+			if ( !empty( $options['cache-versions'] ) )
+				wp_schedule_event( time() + 120, 'twicedaily', self::cron_name );
 		}
 
 		/**
