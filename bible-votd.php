@@ -2,8 +2,8 @@
 /*
 Plugin Name: BibleGateway VOTD
 Plugin URI: http://zaikos.com/biblegateway-votd/
-Description: Insert <a href="http://www.biblegateway.com/usage/">BibleGateway.com</a>'s verse of the day in pages or posts. Use the Widgets page to add the verse to your sidebar or add <strong>[bible-votd]</strong> in pages or posts where you want to insert the verse.
-Version: 3.0
+Description: Insert <a href="http://www.biblegateway.com/usage/">BibleGateway.com</a>'s verse of the day in pages or posts. Use the Widgets page to add the verse to your sidebar or add <strong>[biblevotd]</strong> in pages or posts where you want to insert the verse.
+Version: 3.0-dev
 Author: Dave Zaikos
 Author URI: http://zaikos.com/
 License: GPL2

@@ -37,7 +37,6 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			add_filter( 'plugin_action_links_' . str_replace( '-admin', '', plugin_basename( __FILE__ ) ), array( &$this, 'add_plugin_page_settings_link' ) );
 			add_action( 'admin_menu', array( &$this, 'add_admin_menu' ) );
 			add_action( 'admin_init', array( &$this, 'settings_init' ) );
-			add_action( 'add_option_' . dz_biblegateway_votd::transient_name, array( &$this, 'add_transient_option' ) );
 
 			// Cron hooks.
 
@@ -188,7 +187,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 
 	<h3>Usage</h3>
 
-	<p>Use the <a href="<?php echo admin_url( 'widgets.php' ); ?>">Widgets</a> page to add the verse to one or more of your sidebars. You can include the verse in a page or post by using the shortcode <code>[biblevotd]</code>. When using the shortcode you can override the default version (set below) by providing the version abbreviation (for example, <code>[biblevotd version="KJV"]</code> to use the King James Version).</p>
+	<p>Use the <a href="<?php echo admin_url( 'widgets.php' ); ?>">Widgets</a> page to add the verse to one or more of your sidebars. You can include the verse in a page or post by using the shortcode <code>[<?php echo esc_html( dz_biblegateway_votd::shortcode_name ); ?>]</code>. When using the shortcode you can override the default version (set below) by providing the version abbreviation (for example, <code>[<?php echo esc_html( dz_biblegateway_votd::shortcode_name ); ?> version="KJV"]</code> to use the King James Version).</p>
 
 	<form action="options.php" method="post">
 <?php
@@ -350,16 +349,6 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 </select>
 <span class="description">Hold the Command key (Mac) or the Control key (others) to select multiple versions. Versions selected here will be cached daily by WordPress to prevent page loading delays when display the verse (Embed Method above must be set to <code>Cache</code>).
 <?php
-			if ( $next = wp_next_scheduled( self::cron_name ) ) :
-?>
-<br />
-<span>
-	<?php
-				printf( 'Next caching is on: <code>%s</code>.', date_i18n( _x( 'Y-m-d G:i:s', 'timezone date format' ), $next ) );
-?>
-</span>
-<?php
-			endif;
 		}
 
 		/**
@@ -449,23 +438,6 @@ e.copyright+
 		}
 
 		/**
-		 * add_transient_option function.
-		 *
-		 * Make sure the transient value autoloads (even though it has an expiration).
-		 *
-		 * @access public
-		 * @uses wpdb::update()
-		 * @return void
-		 */
-		public function add_transient_option() {
-			global $wpdb;
-
-			foreach ( array( '_transient_timeout_' . dz_biblegateway_votd::transient_name, '_transient_' . dz_biblegateway_votd::transient_name ) as $option ) {
-				$wpdb->update( $wpdb->options, array( 'autoload' => 'yes' ), array( 'option_name' => $option ) );
-			}
-		}
-
-		/**
 		 * cache_verses function.
 		 *
 		 * The main handler for fetching the verses and storing them using the WordPress Transient API.
@@ -487,11 +459,12 @@ e.copyright+
 
 			// Clear the existing cache.
 
-			delete_transient( dz_biblegateway_votd::transient_name );
+			$cache = get_transient( dz_biblegateway_votd::transient_name );
+			if ( false === $cache || !is_array( $cache ) )
+				$cache = array();
 
 			// Fetch each version.
 
-			$cache = array();
 			foreach ( $versions as $version ) {
 				$resp = wp_remote_get( sprintf( self::bg_api_uri, $version ) );
 
@@ -509,7 +482,7 @@ e.copyright+
 			// If versions were fetched, store them as a transient.
 
 			if ( !empty( $cache ) )
-				set_transient( dz_biblegateway_votd::transient_name, $cache, 86399 );
+				set_transient( dz_biblegateway_votd::transient_name, $cache, 0 );
 		}
 
 		/**
@@ -528,8 +501,8 @@ e.copyright+
 
 			$this->unschedule_fetch();
 
-			if ( !empty( $options['cache-versions'] ) )
-				wp_schedule_event( time() + 120, 'twicedaily', self::cron_name );
+			if ( 'cache' == $options['embed-method'] && !empty( $options['cache-versions'] ) )
+				wp_schedule_event( time() + 120, 'hourly', self::cron_name );
 		}
 
 		/**
@@ -547,6 +520,6 @@ e.copyright+
 
 	}
 
-	if ( !isset( $theme_dz_biblegateway_votd_admin ) )
-		$theme_dz_biblegateway_votd_admin = new dz_biblegateway_votd_admin();
+	if ( !isset( $plugin_dz_biblegateway_votd_admin ) )
+		$plugin_dz_biblegateway_votd_admin = new dz_biblegateway_votd_admin();
 }
