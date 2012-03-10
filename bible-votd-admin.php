@@ -22,7 +22,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		/**
 		 * bg_api_url
 		 *
-		 * The BibleGateway.com API URI. Sprintf-ready--%1$s is the version abbreviation.
+		 * The BibleGateway.com API URI. Sprintf-ready where %1$s is the version abbreviation.
 		 */
 		const bg_api_uri = 'http://www.biblegateway.com/votd/get/?format=json&version=%1$s';
 
@@ -457,7 +457,7 @@ e.copyright+
 			$options = get_option( dz_biblegateway_votd::option_name );
 			$versions = ( isset( $options['cache-versions'] ) ) ? $options['cache-versions'] : array();
 
-			// Clear the existing cache.
+			// Get the existing cache.
 
 			$cache = get_transient( dz_biblegateway_votd::transient_name );
 			if ( false === $cache || !is_array( $cache ) )
@@ -468,15 +468,22 @@ e.copyright+
 			foreach ( $versions as $version ) {
 				$resp = wp_remote_get( sprintf( self::bg_api_uri, $version ) );
 
-				if ( 200 != wp_remote_retrieve_response_code( $resp ) )
+				if ( 200 != wp_remote_retrieve_response_code( $resp ) ) {
+				
+					// Removed expired version cache.
+				
+					if ( isset( $cache[$version]['date'] ) && ( time() - $cache[$version]['date'] ) > 86400 )
+						unset( $cache[$version] );
+				
 					continue;
+				}
 
-				$body = wp_remote_retrieve_body( $resp );
+				$raw = wp_remote_retrieve_body( $resp );
 
-				$verse = $this->remote_get_json_helper( $body );
+				$parsed = $this->remote_get_json_helper( $raw );
 
-				if ( false !== $verse )
-					$cache[$version] = $verse;
+				if ( false !== $parsed )
+					$cache[$version] = $parsed;
 			}
 
 			// If versions were fetched, store them as a transient.
