@@ -37,6 +37,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			add_filter( 'plugin_action_links_' . str_replace( '-admin', '', plugin_basename( __FILE__ ) ), array( &$this, 'add_plugin_page_settings_link' ) );
 			add_action( 'admin_menu', array( &$this, 'add_admin_menu' ) );
 			add_action( 'admin_init', array( &$this, 'settings_init' ) );
+			register_deactivation_hook( __FILE__, array( &$this, 'remove_cache' ) );
 
 			// Cron hooks.
 
@@ -469,10 +470,10 @@ e.copyright+
 				$resp = wp_remote_get( sprintf( self::bg_api_uri, $version ) );
 
 				if ( 200 != wp_remote_retrieve_response_code( $resp ) ) {
+			
+					// Removed version cache if it's been around for more than a day.
 				
-					// Removed expired version cache.
-				
-					if ( isset( $cache[$version]['date'] ) && ( time() - $cache[$version]['date'] ) > 86400 )
+					if ( isset( $cache[$version]['date'] ) && ( mktime( 0, 0, 0 ) - $cache[$version]['date'] ) > 86400 )
 						unset( $cache[$version] );
 				
 					continue;
@@ -508,7 +509,7 @@ e.copyright+
 
 			$this->unschedule_fetch();
 
-			if ( 'cache' == $options['embed-method'] && !empty( $options['cache-versions'] ) )
+			if ( isset( $options['embed-method'] ) && 'cache' == $options['embed-method'] && !empty( $options['cache-versions'] ) )
 				wp_schedule_event( time() + 120, 'hourly', self::cron_name );
 		}
 
@@ -523,6 +524,19 @@ e.copyright+
 		 */
 		public function unschedule_fetch() {
 			wp_clear_scheduled_hook( self::cron_name );
+		}
+
+		/**
+		 * remove_cache function.
+		 *
+		 * Deletes the transient cache.
+		 *
+		 * @access public
+		 * @uses delete_transient()
+		 * @return void
+		 */
+		public function remove_cache() {
+			delete_transient( dz_biblegateway_votd::transient_name );
 		}
 
 	}
