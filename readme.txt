@@ -16,7 +16,7 @@ The plugin defaults to using the NIV translation. You can specify other translat
 
 `[biblevotd version="KJV"]`
 
-Version 3.0 of this plugin is a complete rewrite. It leverages several new methods for retrieving the verse to prevent any delays when visitors load your site. The plugin will attempt to retrieve and cache the verse once daily. If it is available it will directly serve the cache. If it is not, it will fallback to using the jQuery JavaScript library. This allows the JavaScript code necessary to insert the verse to not execute until the entire page on your site has finished loading (allowing your site load uninterrupted, regardless of any delays from BibleGateway.com).
+Version 3.0 of this plugin is a complete rewrite. It leverages several new methods for retrieving the verse to prevent any delays when visitors load your site. The plugin will attempt to retrieve and cache the verse behind the scenes. If it is available it will directly serve the cache. If it is not, it will fallback to using the jQuery JavaScript library. This allows the JavaScript code necessary to insert the verse to not execute until the entire page on your site has finished loading (allowing your site load uninterrupted, regardless of any delays from BibleGateway.com).
 
 Because of the unique nature of this plugin, you can insert multiple verses of the day (in different translations) across your web site. Something the code BibleGateway.com provides cannot do!
 
