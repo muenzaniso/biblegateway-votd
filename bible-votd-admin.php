@@ -166,6 +166,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 
 			add_settings_section( 'biblevotd_options_advance', 'Advance', create_function( '', '' ), 'dz_biblevotd_options_sections' );
 			add_settings_field( dz_biblegateway_votd::option_name . '[extra-versions]', 'Additional Versions', array( &$this, 'setting_field_extra_versions' ), 'dz_biblevotd_options_sections', 'biblevotd_options_advance', array( 'label_for' => 'extra-versions' ) );
+			add_settings_field( dz_biblegateway_votd::option_name . '-clear-cache', 'Cache', array( &$this, 'setting_field_clear_cache' ), 'dz_biblevotd_options_sections', 'biblevotd_options_advance', array( 'label_for' => 'clear-cache' ) );
 		}
 
 		/**
@@ -373,6 +374,47 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 <textarea name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[extra-versions]' ); ?>" rows="10" cols="50" id="extra-versions" class="large-text code"><?php echo esc_attr( rtrim( $versions, "\n" ) ); ?></textarea>
 <span class="description">You can manually add extra versions available from BibleGateway.com. Enter one version per line in the format: <code>ABBREVIATION,Full Name</code>.</span>
 <?php
+		}
+
+		/**
+		 * setting_field_extra_versions function.
+		 *
+		 * Creates a text box that allows users to add additional Bible versions.
+		 *
+		 * @access public
+		 * @return void
+		 */
+		public function setting_field_clear_cache() {
+			$cache = get_transient( dz_biblegateway_votd::transient_name );
+			if ( false === $cache || !is_array( $cache ) )
+				$cache = array();
+			else
+				$cache = array_keys( $cache );
+			$num_cached = count( $cache );
+
+			$options = get_option( dz_biblegateway_votd::option_name );
+			
+			$use_cache = ( 'cache' == $options['embed-method'] && !empty( $options['cache-versions'] ) );
+			$cron = wp_next_scheduled( dz_biblegateway_votd::option_name );
+			
+			
+			if ( $use_cache ) :
+				$output = sprintf( _n( '%d version cached', '%d versions cached', $num_cached ), $num_cached );
+				if ( $num_cached > 0 )
+					$output .= ': ' . esc_html( implode( ', ', $cache ) );
+				$output .= '.';
+				
+				if ( $cron )
+					$output .= "<br />\nNext refresh: <code>" . date_i18n( _x( 'Y-m-d G:i:s', 'timezone date format' ), $cron, false ) . "</code>";
+				
+				echo $output;
+?>
+
+<p class="submit">
+	<input type="submit" name="clear-cache" class="button" value="Clear Cache" />
+</p>
+<?php
+			endif;
 		}
 
 		/**
