@@ -421,7 +421,7 @@ Disabled.
 			$output .= '.';
 
 			if ( $cron = wp_next_scheduled( self::cron_name ) )
-				$output .= sprintf( "<br />\nNext refresh: <code>%s</code>", date_i18n( _x( 'Y-m-d G:i:s', 'timezone date format' ), $cron, false ) );
+				$output .= sprintf( "<br />\nNext refresh: <code>%s</code>", date_i18n( _x( 'Y-m-d G:i:s', 'timezone date format' ), $cron + ( get_option( 'gmt_offset' ) * 3600 ), false ) );
 
 			echo $output;
 ?>
@@ -507,7 +507,7 @@ e.copyright+
 '</a>. Powered by <a href="http://www.biblegateway.com/">BibleGateway.com</a>.');});});});
 */
 
-			$json = json_decode( $json );
+			$json = json_decode( $json, true );
 
 			// BibleGateway.com returns the request nested in another array. Move it up.
 
@@ -622,7 +622,7 @@ e.copyright+
 			$this->unschedule_fetch();
 
 			if ( $this->use_cache() )
-				wp_schedule_event( current_time( 'timestamp' ) + 599, 'hourly', self::cron_name );
+				wp_schedule_event( time() + 300, 'hourly', self::cron_name );
 		}
 
 		/**

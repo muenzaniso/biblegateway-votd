@@ -261,10 +261,8 @@ jQuery(document).ready(function(b){var a=<?php echo json_encode( $this->instance
 
 			switch( $method ) {
 				case 'cache':
-					if ( get_transient( self::transient_name ) ) {
-						if ( !( $cache = $this->get_cached_html_code() ) )
-							return $cache;
-					}
+					if ( get_transient( self::transient_name ) && $cache = $this->get_cached_html_code() )
+						return $cache;
 
 				case 'jquery':
 					wp_enqueue_script( 'jquery' );
