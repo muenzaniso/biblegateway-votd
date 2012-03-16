@@ -545,30 +545,33 @@ Clear Cache</label>
 			// Fetch each version.
 
 			foreach ( $versions as $version ) {
-				$resp = wp_remote_get( sprintf( self::bg_api_uri, $version ) );
 
-				if ( 200 != wp_remote_retrieve_response_code( $resp ) ) {
+				// Do not re-cache verses that are still for the present day.
 
-					// Removed version cache if it's been around for more than a day.
-
-					if ( isset( $cache[$version]['date'] ) && ( mktime( 0, 0, 0 ) - $cache[$version]['date'] ) > 86400 )
-						unset( $cache[$version] );
-
+				if ( mktime( 0, 0, 0 ) == $cache[$version]['date'] )
 					continue;
-				}
+
+				// Remove this cached version and attempt to update the cache.
+
+				unset( $cache[$version] );
+
+				$resp = wp_remote_get( sprintf( self::bg_api_uri, $version ) );
+				if ( 200 != wp_remote_retrieve_response_code( $resp ) ) // Failed to update. Try again at next cron action.
+					continue;
 
 				$raw = wp_remote_retrieve_body( $resp );
-
 				$parsed = $this->remote_get_json_helper( $raw );
 
 				if ( false !== $parsed )
 					$cache[$version] = $parsed;
 			}
 
-			// If versions were fetched, store them as a transient.
+			// If versions were fetched, store them as a transient. Otherwise, clean up the transient.
 
 			if ( !empty( $cache ) )
 				set_transient( dz_biblegateway_votd::transient_name, $cache, 0 );
+			else
+				$this->remove_cache();
 		}
 
 		/**

@@ -210,7 +210,7 @@ jQuery(document).ready(function(b){var a=<?php echo json_encode( $this->instance
 			end( $this->instances );
 			$version = current( $this->instances );
 
-			if ( isset( $cache[$version] ) )
+			if ( isset( $cache[$version]['verse'] ) )
 				return $cache[$version]['verse'];
 
 			return false;
