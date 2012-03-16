@@ -154,6 +154,9 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		 * Utilizes the WordPress Settings API to set up settings.
 		 *
 		 * @access public
+		 * @uses register_setting()
+		 * @uses add_settings_section()
+		 * @uses add_settings_field()
 		 * @return void
 		 */
 		public function settings_init() {
@@ -166,7 +169,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 
 			add_settings_section( 'biblevotd_options_advance', 'Advance', create_function( '', '' ), 'dz_biblevotd_options_sections' );
 			add_settings_field( dz_biblegateway_votd::option_name . '[extra-versions]', 'Additional Versions', array( &$this, 'setting_field_extra_versions' ), 'dz_biblevotd_options_sections', 'biblevotd_options_advance', array( 'label_for' => 'extra-versions' ) );
-			add_settings_field( dz_biblegateway_votd::option_name . '-clear-cache', 'Cache', array( &$this, 'setting_field_clear_cache' ), 'dz_biblevotd_options_sections', 'biblevotd_options_advance', array( 'label_for' => 'clear-cache' ) );
+			add_settings_field( dz_biblegateway_votd::option_name . '[clear-cache]', 'Cache', array( &$this, 'setting_field_clear_cache' ), 'dz_biblevotd_options_sections', 'biblevotd_options_advance' );
 		}
 
 		/**
@@ -178,7 +181,6 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		 * @return void
 		 */
 		public function biblevotd_options_page() {
-			settings_errors();
 ?>
 <div class="wrap">
 <?php screen_icon(); ?>
@@ -195,11 +197,8 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 <?php
 			settings_fields( 'dz_biblevotd_options' );
 			do_settings_sections( 'dz_biblevotd_options_sections' );
+			submit_button();
 ?>
-
-		<p class="submit">
-			<input type="submit" name="Submit" class="button-primary" value="<?php esc_attr_e( 'Save Changes' ); ?>" />
-		</p>
 	</form>
 </div>
 <?php
@@ -212,9 +211,11 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		 *
 		 * @access public
 		 * @uses self::default_plugin_options()
+		 * @uses self::remove_cache()
+		 * @uses add_settings_error()
 		 * @see update_option()
 		 * @param mixed $input
-		 * @return void
+		 * @return void|array Nothing if the cache was cleared, or an array of sanitized data.
 		 */
 		public function settings_validation( $input ) {
 
@@ -266,7 +267,16 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			}
 			$options['extra-versions'] = $valid;
 
+			// Clear the cache if selected.
+
+			if ( isset( $input['clear-cache'] ) ) {
+				$this->remove_cache();
+				add_settings_error( 'general', dz_biblegateway_votd::option_name . '_clear-cache', 'Cache cleared.', 'updated' );
+			}
+
 			// Return sanitized options.
+
+			add_settings_error( 'general', 'settings_update', __( 'Settings saved.' ), 'updated' );
 
 			return $options;
 		}
@@ -377,14 +387,25 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		}
 
 		/**
-		 * setting_field_extra_versions function.
+		 * setting_field_clear_cache function.
 		 *
-		 * Creates a text box that allows users to add additional Bible versions.
+		 * Displays the versions presently cached and provides a button to clear the cache.
 		 *
 		 * @access public
+		 * @uses self::use_cache()
+		 * @uses get_transient()
+		 * @uses wp_next_scheduled()
 		 * @return void
 		 */
 		public function setting_field_clear_cache() {
+			if ( !$this->use_cache() ) {
+?>
+Disabled.
+<span class="description">To enable caching select <code>Cache</code> as the Embed Method and then the version(s) to be cached.</span>
+<?php
+				return;
+			}
+
 			$cache = get_transient( dz_biblegateway_votd::transient_name );
 			if ( false === $cache || !is_array( $cache ) )
 				$cache = array();
@@ -392,29 +413,34 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 				$cache = array_keys( $cache );
 			$num_cached = count( $cache );
 
-			$options = get_option( dz_biblegateway_votd::option_name );
-			
-			$use_cache = ( 'cache' == $options['embed-method'] && !empty( $options['cache-versions'] ) );
-			$cron = wp_next_scheduled( dz_biblegateway_votd::option_name );
-			
-			
-			if ( $use_cache ) :
-				$output = sprintf( _n( '%d version cached', '%d versions cached', $num_cached ), $num_cached );
-				if ( $num_cached > 0 )
-					$output .= ': ' . esc_html( implode( ', ', $cache ) );
-				$output .= '.';
-				
-				if ( $cron )
-					$output .= "<br />\nNext refresh: <code>" . date_i18n( _x( 'Y-m-d G:i:s', 'timezone date format' ), $cron, false ) . "</code>";
-				
-				echo $output;
+			$output = sprintf( _n( '%d version cached', '%d versions cached', $num_cached ), $num_cached );
+			if ( $num_cached > 0 )
+				$output .= ': ' . esc_html( implode( ', ', $cache ) );
+			$output .= '.';
+
+			if ( $cron = wp_next_scheduled( dz_biblegateway_votd::option_name ) )
+				$output .= sprintf( "<br />\nNext refresh: <code>%s</code>", date_i18n( _x( 'Y-m-d G:i:s', 'timezone date format' ), $cron, false ) );
+
+			echo $output;
 ?>
 
-<p class="submit">
-	<input type="submit" name="clear-cache" class="button" value="Clear Cache" />
-</p>
+<br />
+<label for="clear-cache"><input name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[clear-cache]' ); ?>" type="checkbox" id="clear-cache" value="1" />
+Clear Cache</label>
 <?php
-			endif;
+		}
+
+		/**
+		 * use_cache function.
+		 *
+		 * @access private
+		 * @uses get_option()
+		 * @return bool True if caching is selected and cache versions chosen, otherwise false.
+		 */
+		private function use_cache() {
+			$options = get_option( dz_biblegateway_votd::option_name );
+
+			return ( isset( $options['embed-method'] ) && 'cache' == $options['embed-method'] && !empty( $options['cache-versions'] ) );
 		}
 
 		/**
@@ -512,12 +538,12 @@ e.copyright+
 				$resp = wp_remote_get( sprintf( self::bg_api_uri, $version ) );
 
 				if ( 200 != wp_remote_retrieve_response_code( $resp ) ) {
-			
+
 					// Removed version cache if it's been around for more than a day.
-				
+
 					if ( isset( $cache[$version]['date'] ) && ( mktime( 0, 0, 0 ) - $cache[$version]['date'] ) > 86400 )
 						unset( $cache[$version] );
-				
+
 					continue;
 				}
 
@@ -543,6 +569,7 @@ e.copyright+
 		 *
 		 * @access public
 		 * @uses self::unschedule_fetch()
+		 * @uses self::use_cache()
 		 * @uses wp_schedule_event()
 		 * @return void
 		 */
@@ -551,7 +578,7 @@ e.copyright+
 
 			$this->unschedule_fetch();
 
-			if ( isset( $options['embed-method'] ) && 'cache' == $options['embed-method'] && !empty( $options['cache-versions'] ) )
+			if ( $this->use_cache() )
 				wp_schedule_event( time() + 120, 'hourly', self::cron_name );
 		}
 
