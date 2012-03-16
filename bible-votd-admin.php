@@ -393,7 +393,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		 *
 		 * @access public
 		 * @uses self::use_cache()
-		 * @uses get_transient()
+		 * @uses self::get_cache()
 		 * @uses wp_next_scheduled()
 		 * @return void
 		 */
@@ -406,11 +406,7 @@ Disabled.
 				return;
 			}
 
-			$cache = get_transient( dz_biblegateway_votd::transient_name );
-			if ( false === $cache || !is_array( $cache ) )
-				$cache = array();
-			else
-				$cache = array_keys( $cache );
+			$cache = array_keys( $this->get_cache() );
 			$num_cached = count( $cache );
 
 			$output = sprintf( _n( '%d version cached', '%d versions cached', $num_cached ), $num_cached );
@@ -418,7 +414,7 @@ Disabled.
 				$output .= ': ' . esc_html( implode( ', ', $cache ) );
 			$output .= '.';
 
-			if ( $cron = wp_next_scheduled( dz_biblegateway_votd::option_name ) )
+			if ( $cron = wp_next_scheduled( self::cron_name ) )
 				$output .= sprintf( "<br />\nNext refresh: <code>%s</code>", date_i18n( _x( 'Y-m-d G:i:s', 'timezone date format' ), $cron, false ) );
 
 			echo $output;
@@ -441,6 +437,23 @@ Clear Cache</label>
 			$options = get_option( dz_biblegateway_votd::option_name );
 
 			return ( isset( $options['embed-method'] ) && 'cache' == $options['embed-method'] && !empty( $options['cache-versions'] ) );
+		}
+
+		/**
+		 * get_cache function.
+		 *
+		 * Returns an array of cache verses or an empty array if the cache does not exist (or is not an array).
+		 *
+		 * @access private
+		 * @uses get_transient()
+		 * @return array An array of cached verses.
+		 */
+		private function get_cache() {
+			$cache = get_transient( dz_biblegateway_votd::transient_name );
+			if ( false === $cache || !is_array( $cache ) )
+				return array();
+
+			return $cache;
 		}
 
 		/**
@@ -515,6 +528,7 @@ e.copyright+
 		 * @uses wp_remote_get()
 		 * @uses wp_remote_retrieve_response_code()
 		 * @uses wp_remote_retrieve_body()
+		 * @uses self::get_cache()
 		 * @uses self::remote_get_json_helper()
 		 * @uses self::get_next_flush_time()
 		 * @return void
@@ -528,9 +542,7 @@ e.copyright+
 
 			// Get the existing cache.
 
-			$cache = get_transient( dz_biblegateway_votd::transient_name );
-			if ( false === $cache || !is_array( $cache ) )
-				$cache = array();
+			$cache = $this->get_cache();
 
 			// Fetch each version.
 
