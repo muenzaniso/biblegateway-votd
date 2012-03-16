@@ -46,6 +46,11 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			register_deactivation_hook( __FILE__, array( &$this, 'unschedule_fetch' ) );
 			add_action( 'add_option_' . dz_biblegateway_votd::option_name, array( &$this, 'schedule_fetch' ) );
 			add_action( 'update_option_' . dz_biblegateway_votd::option_name, array( &$this, 'schedule_fetch' ) );
+
+			// Widget hooks.
+
+			add_action( 'add_option_' . 'widget_' . 'dz_biblegateway_votd', array( &$this, 'update_widget_settings' ), 10, 2 );
+			add_action( 'update_option_' . 'widget_' . 'dz_biblegateway_votd', array( &$this, 'update_widget_settings' ), 10, 2 );
 		}
 
 		/**
@@ -407,6 +412,7 @@ Disabled.
 			}
 
 			$cache = array_keys( $this->get_cache() );
+			sort( $cache );
 			$num_cached = count( $cache );
 
 			$output = sprintf( _n( '%d version cached', '%d versions cached', $num_cached ), $num_cached );
@@ -421,7 +427,7 @@ Disabled.
 ?>
 
 <br />
-<label for="clear-cache"><input name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[clear-cache]' ); ?>" type="checkbox" id="clear-cache" value="1" />
+<label for="clear-cache"><input name="<?php echo esc_attr( dz_biblegateway_votd::option_name . '[clear-cache]' ); ?>" type="checkbox" id="clear-cache" value="1"<?php disabled( $num_cached, 0 ); ?> />
 Clear Cache</label>
 <?php
 		}
@@ -618,6 +624,40 @@ e.copyright+
 		 */
 		public function remove_cache() {
 			delete_transient( dz_biblegateway_votd::transient_name );
+		}
+
+		/**
+		 * update_widget_settings function.
+		 *
+		 * Runs when a widget is saved. If caching is enabled, this will add the Bible
+		 * version selected in the widget as a cachable version.
+		 *
+		 * @access public
+		 * @param mixed $old_settings
+		 * @param mixed $new_settings
+		 * @return void
+		 */
+		public function update_widget_settings( $old_settings, $new_settings ) {
+			$options = get_option( dz_biblegateway_votd::option_name );
+
+			// Only run when caching is enabled.
+
+			if ( !isset( $options['embed-method'] ) || 'cache' != $options['embed-method'] )
+				return;
+
+			// Loop through each widget and add the cached version if it's not in the list already.
+
+			$cached =& $options['cache-versions'];
+
+			foreach ( $new_settings as $widget ) {
+				$version = dz_biblegateway_votd::is_version_available( $widget['version'] );
+				if ( $version && !in_array( $version, $cached ) )
+					$cached[] = $version;
+			}
+
+			// Update options.
+
+			update_option( dz_biblegateway_votd::option_name, $options );
 		}
 
 	}
