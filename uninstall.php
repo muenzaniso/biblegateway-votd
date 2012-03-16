@@ -16,6 +16,8 @@ if ( !function_exists( 'dz_biblegateway_votd_uninstall' ) ) {
 		}
 
 		delete_transient( 'dz_biblegateway_votd_cache' );
+
+		delete_option( 'widget_' . 'dz_biblegateway_votd' ); // Added by WordPress. See {@link WP_Widget::save_settings()}.
 	}
 
 	if ( defined( 'WP_UNINSTALL_PLUGIN' ) )
