@@ -514,15 +514,40 @@ e.copyright+
 			if ( 1 == count( $json ) && is_array( current( $json ) ) )
 				$json = current( $json );
 
+			// Make sure we have all the information we need.
+
+			if ( !isset( $json['text'], $json['reference'], $json['permalink'], $json['day'], $json['month'], $json['year'], $json['copyrightlink'], $json['copyright'] ) )
+				return false;
+
+			// Sanitize the information and remove whitespace.
+
+			$filtered = array_map( 'wp_strip_all_tags', $json );
+
 			// Is this a new day?
 
-			if ( date( 'Ymd' ) != $json['year'] . $json['month'] . $json['day'] )
+			if ( date( 'Ymd' ) != $filtered['year'] . $filtered['month'] . $filtered['day'] )
 				return false;
 
 			// Build the verse.
 
+			$verse = esc_html( $filtered['text'] ) . ' &#8212; ';
+			$verse .= '<a href="' . esc_url( $filtered['permalink'], array( 'http', 'https' ) ) . '">';
+			$verse .= esc_html( $filtered['reference'] ) . '</a>';
 
-			return false;
+			if ( isset( $filtered['audiolink'] ) ) {
+				$verse .= ' <a href="' . esc_url( $filtered['audiolink'], array( 'http', 'https' ) ) . '" title="Listen to chapter">';
+				$verse .= '<img width="13" height="12" src="http://www.biblegateway.com/resources/audio/images/sound.gif" alt="Listen to chapter" /></a>';
+			}
+
+			$verse .= ' <a href="' . esc_url( $filtered['copyrightlink'], array( 'http', 'https' ) ) . '">';
+			$verse .= esc_html( $filtered['copyright'] ) . '</a>. ';
+			$verse .= 'Powered by <a href="http://www.biblegateway.com/">BibleGateway.com</a>.';
+
+			$date = mktime( 0, 0, 0, $filtered['month'], $filtered['day'], $filtered['year'] );
+
+			// Put it all together and return.
+
+			return compact( 'date', 'verse' );
 		}
 
 		/**

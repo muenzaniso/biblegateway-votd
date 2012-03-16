@@ -211,7 +211,7 @@ jQuery(document).ready(function(b){var a=<?php echo json_encode( $this->instance
 			$version = current( $this->instances );
 
 			if ( isset( $cache[$version] ) )
-				return $cache[$version];
+				return $cache[$version]['verse'];
 
 			return false;
 		}
