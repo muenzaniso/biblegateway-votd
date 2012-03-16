@@ -190,7 +190,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 ?>
 <script type="text/javascript">
 /* <![CDATA[ */
-jQuery(document).ready(function(b){var a=<?php echo json_encode( $this->instances ); ?>;b.each(a,function(d,c){b.getJSON("http://www.biblegateway.com/votd/get?callback=?",{format:"json",version:c},function(f){if("undefined"!=typeof f.error){return true;}var e=f.votd;b("div#biblegateway-votd-"+d).html(e.text+' &#8212; <a href="'+e.permalink+'">'+e.reference+"</a>."+("undefined"!=typeof e.audiolink?' <a href="'+e.audiolink+'" title="Listen to chapter"><img width="13" height="12" src="http://www.biblegateway.com/resources/audio/images/sound.gif" alt="Listen to chapter" /></a>':"")+' <a href="'+e.copyrightlink+'">'+e.copyright+'</a>. Powered by <a href="http://www.biblegateway.com/">BibleGateway.com</a>.');});});});
+jQuery(document).ready(function(b){var a=<?php echo json_encode( $this->instances ); ?>;b.each(a,function(d,c){b.getJSON("http://www.biblegateway.com/votd/get?callback=?",{format:"json",version:c},function(f){if("undefined"!=typeof f.error){return true;}var e=f.votd;b("div#biblegateway-votd-"+d).html(e.text+' &#8212; <a href="'+e.permalink+'">'+e.reference+"</a>."+("undefined"!=typeof e.audiolink?' <a href="'+e.audiolink+'" title="Listen to chapter"><img width="13" height="12" src="http://www.biblegateway.com/resources/audio/images/sound.gif" alt="Listen to chapter" /></a>':"")+' <a href="'+e.copyrightlink+'">'+e.copyright.replace(/\.+$/,"")+'</a>. Powered by <a href="http://www.biblegateway.com/">BibleGateway.com</a>.');});});});
 /* ]]> */
 </script>
 <?php

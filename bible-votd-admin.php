@@ -507,7 +507,7 @@ Clear Cache</label>
 			}
 
 			$verse .= ' <a href="' . esc_url( $filtered['copyrightlink'], array( 'http', 'https' ) ) . '">';
-			$verse .= esc_html( $filtered['copyright'] ) . '</a>. ';
+			$verse .= esc_html( rtrim( $filtered['copyright'], '.' ) ) . '</a>. ';
 			$verse .= 'Powered by <a href="http://www.biblegateway.com/">BibleGateway.com</a>.';
 
 			$date = mktime( 0, 0, 0, $filtered['month'], $filtered['day'], $filtered['year'] );

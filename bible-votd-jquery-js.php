@@ -13,7 +13,7 @@ jQuery( document ).ready( function( $ ) {
 			$( 'div#biblegateway-votd-' + id ).html(
 				votd.text + ' &#8212; <a href="' + votd.permalink +'">' + votd.reference + '</a>.' +
 				( 'undefined' != typeof votd.audiolink ? ' <a href="' + votd.audiolink + '" title="Listen to chapter"><img width="13" height="12" src="http://www.biblegateway.com/resources/audio/images/sound.gif" alt="Listen to chapter" /></a>' : '' ) +
-				' <a href="' + votd.copyrightlink + '">' + votd.copyright + '</a>.' +
+				' <a href="' + votd.copyrightlink + '">' + votd.copyright.replace( /\.+$/, "" ) + '</a>.' +
 				' Powered by <a href="http://www.biblegateway.com/">BibleGateway.com</a>.'
 			);
 		} );
