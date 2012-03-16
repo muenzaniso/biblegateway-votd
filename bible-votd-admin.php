@@ -591,7 +591,7 @@ e.copyright+
 			$this->unschedule_fetch();
 
 			if ( $this->use_cache() )
-				wp_schedule_event( time() + 120, 'hourly', self::cron_name );
+				wp_schedule_event( current_time( 'timestamp' ) + 120, 'hourly', self::cron_name );
 		}
 
 		/**
