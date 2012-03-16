@@ -635,6 +635,9 @@ e.copyright+
 		 * @access public
 		 * @param mixed $old_settings
 		 * @param mixed $new_settings
+		 * @uses dz_biblegateway_votd::is_version_available
+		 * @uses get_option()
+		 * @uses update_option()
 		 * @return void
 		 */
 		public function update_widget_settings( $old_settings, $new_settings ) {
