@@ -548,7 +548,7 @@ Clear Cache</label>
 
 				// Do not re-cache verses that are still for the present day.
 
-				if ( mktime( 0, 0, 0 ) == $cache[$version]['date'] )
+				if ( isset( $cache[$version]['date' ) && mktime( 0, 0, 0 ) == $cache[$version]['date'] )
 					continue;
 
 				// Remove this cached version and attempt to update the cache.
