@@ -474,39 +474,6 @@ Clear Cache</label>
 		 * @return bool|array A boolean false if nothing could be parsed. An associative array containing the filtered verse and raw JSON request.
 		 */
 		private function remote_get_json_helper( $json ) {
-
-/*
-
-{"votd":{"text":"&ldquo;[Thanksgiving and Prayer]  We ought always to thank God for you, brothers and sisters, and rightly so, because your faith is growing more and more, and the love all of you have for one another is increasing.&rdquo;",
-"display_ref":"2 Thessalonians 1:3",
-"reference":"2 Thessalonians 1:3",
-"permalink":"http:\/\/www.biblegateway.com\/passage\/?version=NIV&amp;search=2 Thessalonians 1:3",
-"copyright":"Copyright &#169;  1973, 1978, 1984, 2011 by Biblica",
-"copyrightlink":"http:\/\/www.biblegateway.com\/versions\/index.php?action=getVersionInfo&amp;vid=31&amp;lang=2",
-"audiolink":"http:\/\/www.biblegateway.com\/audio\/mclean\/niv\/2Thess.1.3",
-"day":"09",
-"month":"02",
-"year":"2012",
-"version":"New International Version",
-"version_id":"NIV"}}
-*/
-/*
-html(e.text+
-' &#8212; <a href="'+
-e.permalink+
-'">'+
-e.reference+
-"</a>."+
-("undefined"!=typeof e.audiolink?' <a href="'+
-e.audiolink+
-'" title="Listen to chapter"><img width="13" height="12" src="http://www.biblegateway.com/resources/audio/images/sound.gif" alt="Listen to chapter" /></a>':"")+
-' <a href="'+
-e.copyrightlink+
-'">'+
-e.copyright+
-'</a>. Powered by <a href="http://www.biblegateway.com/">BibleGateway.com</a>.');});});});
-*/
-
 			$json = json_decode( $json, true );
 
 			// BibleGateway.com returns the request nested in another array. Move it up.
