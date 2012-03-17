@@ -4,7 +4,7 @@ Donate link: http://zaikos.com/donate/
 Tags: bible, biblegateway, verse of the day, votd, niv, kjv, esv
 Requires at least: 3.3
 Tested up to: 3.3.1
-Stable tag: 2.3
+Stable tag: 3.0
 
 Adds BibleGateway.com's verse of the day as a sidebar widget, or on a page or post.
 
@@ -67,13 +67,13 @@ Directly before printing the verse code the plugin passes the information throug
 
 = Why does using the plugin cause page load times to increase? =
 
-As of version 3.0 this should no longer be an issue. This issue is common when inserting content from another site (e.g. BibleGateway.com, Twitter.com, etc.). The delay is caused when BibleGateway.com is slow to provide the verse; as a result, your page halts until BibleGateway.com either responds or times out. Sinve version 3.0 the plugin will by default work around this issue, so you should not experience any delays. If you are, make sure you are using the jQuery or Cache methods for inserting the verse. These methods can be selected from the Bible VOTD settings page and allow your web site page to load without being slowed down by using enhanced JavaScript loading or caching techniques.
+As of version 3.0 this should no longer be an issue. This issue is common when inserting content from another site (e.g. BibleGateway.com, Twitter.com, etc.). The delay is caused when BibleGateway.com is slow to provide the verse; as a result, your page halts until BibleGateway.com either responds or times out. Since version 3.0 the plugin will by default work around this issue, so you should not experience any delays. If you are, make sure you are using the jQuery or Cache methods for inserting the verse. These methods can be selected from the Bible VOTD settings page and allow your web site page to load without being slowed down by using enhanced JavaScript loading or caching techniques.
 
 = Which embed method should I use: Cache, jQuery, or Basic? =
 
-You should Cache; it is the default setting. The plugin is intelligent in that it will continue to fallback to the next method, in order. Selecting Cache will give your site the best opportunity to provide the verse of the day without delays in page loading.
+You should use Cache; it is the default setting. The plugin is intelligent in that it will continue to fallback to the next method, in order. Selecting Cache will give your site the best opportunity to provide the verse of the day without delays in page loading.
 
-The only time you should jQuery is if your web server is not able to fetch remote URLs. How do you know if it can? Simple: If you are able to update plugins, themes, and the WordPress core from within WordPress without issue, you can fetch remote URLs. If you cannot, you should really look into fixing that. :) But also, you should select jQuery as the embed method because there's no sense in your web server trying to cache something all the time when it is simply not able to.
+The only time you should use jQuery is if your web server is not able to fetch remote URLs. How do you know if it can? Simple: If you are able to update plugins, themes, and the WordPress core from within WordPress without issue, you can fetch remote URLs. If you cannot, you should really look into fixing that. :) But also, you should select jQuery as the embed method because there's no sense in your web server trying to cache something all the time when it is simply not able to.
 
 The Basic method should only be used if Cache and jQuery are not working. It uses the identical code provided by BibleGateway.com to insert the verse. This has limitations: It can slow page loading if BibleGateway.com is running slow. The Basic method is only provided in case BibleGateway.com significantly alters their delivery scheme and that results in the other two methods breaking. Switching to Basic should allow you to continue to use the plugin until it is updated.
 

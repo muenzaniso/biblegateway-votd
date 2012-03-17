@@ -469,8 +469,12 @@ Clear Cache</label>
 		 * then extracts the necessary verse information from request response and builds the
 		 * verse for printing.
 		 *
+		 * Final, parsed data is filtered through the dz_biblegateway_json_parsed filter. This allows
+		 * themes and other plugins to handle how the data is cached.
+		 *
 		 * @access private
 		 * @param array $json
+		 * @uses apply_filters()
 		 * @return bool|array A boolean false if nothing could be parsed. An associative array containing the filtered verse and raw JSON request.
 		 */
 		private function remote_get_json_helper( $json ) {
@@ -514,7 +518,10 @@ Clear Cache</label>
 
 			// Put it all together and return.
 
-			return compact( 'date', 'verse' );
+			$parsed = compact( 'date', 'verse' );
+			$parsed = apply_filters( 'dz_biblegateway_json_parsed', $parsed, $json, $filtered );
+
+			return $parsed;
 		}
 
 		/**
