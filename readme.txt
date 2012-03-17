@@ -69,7 +69,7 @@ Directly before printing the verse code the plugin passes the information throug
 
 As of version 3.0 this should no longer be an issue. This issue is common when inserting content from another site (e.g. BibleGateway.com, Twitter.com, etc.). The delay is caused when BibleGateway.com is slow to provide the verse; as a result, your page halts until BibleGateway.com either responds or times out. Sinve version 3.0 the plugin will by default work around this issue, so you should not experience any delays. If you are, make sure you are using the jQuery or Cache methods for inserting the verse. These methods can be selected from the Bible VOTD settings page and allow your web site page to load without being slowed down by using enhanced JavaScript loading or caching techniques.
 
-= Which method should I use: Cache, jQuery, or Basic? =
+= Which embed method should I use: Cache, jQuery, or Basic? =
 
 You should Cache; it is the default setting. The plugin is intelligent in that it will continue to fallback to the next method, in order. Selecting Cache will give your site the best opportunity to provide the verse of the day without delays in page loading.
 
