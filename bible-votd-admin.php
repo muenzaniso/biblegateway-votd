@@ -594,8 +594,6 @@ Clear Cache</label>
 		 * @return void
 		 */
 		public function schedule_fetch() {
-			$options = get_option( dz_biblegateway_votd::option_name );
-
 			$this->unschedule_fetch();
 
 			if ( $this->use_cache() )
