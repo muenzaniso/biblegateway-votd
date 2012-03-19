@@ -37,7 +37,6 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			add_filter( 'plugin_action_links_' . str_replace( '-admin', '', plugin_basename( __FILE__ ) ), array( &$this, 'add_plugin_page_settings_link' ) );
 			add_action( 'admin_menu', array( &$this, 'add_admin_menu' ) );
 			add_action( 'admin_init', array( &$this, 'settings_init' ) );
-			register_deactivation_hook( __FILE__, array( &$this, 'remove_cache' ) );
 
 			// Cron hooks.
 
@@ -236,8 +235,23 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 
 			// Validate the embed method.
 
-			if ( in_array( $input['embed-method'], array( 'cache', 'jquery', 'basic' ) ) )
-				$options['embed-method'] = $input['embed-method'];
+			switch ( $input['embed-method'] ) {
+				case 'basic':
+					$option['embed-method'] = 'basic';
+					$this->remove_cache();
+					break;
+
+				case 'jquery':
+					$option['embed-method'] = 'jquery';
+					$this->remove_cache();
+					break;
+
+				case 'cache':
+				default:
+					$option['embed-method'] = 'cache';
+					set_transient( dz_biblegateway_votd::transient_name, $this->get_cache(), 0 );
+					break;
+			}
 
 			// Validate cache versions.
 
@@ -597,7 +611,7 @@ Clear Cache</label>
 			$this->unschedule_fetch();
 
 			if ( $this->use_cache() )
-				wp_schedule_event( time() + 300, 'hourly', self::cron_name );
+				wp_schedule_event( time() + 60, 'hourly', self::cron_name );
 		}
 
 		/**
@@ -616,14 +630,21 @@ Clear Cache</label>
 		/**
 		 * remove_cache function.
 		 *
-		 * Deletes the transient cache.
+		 * If using the cache embed method, sets the transient cache to an empty array. If not using
+		 * the cache embed method, deletes the transient cache.
 		 *
 		 * @access public
+		 * @uses set_transient()
 		 * @uses delete_transient()
 		 * @return void
 		 */
 		public function remove_cache() {
-			delete_transient( dz_biblegateway_votd::transient_name );
+			$options = get_option( dz_biblegateway_votd::option_name );
+
+			if ( isset( $options['embed-method'] ) && 'cache' == $options['embed-method'] )
+				set_transient( dz_biblegateway_votd::transient_name, array(), 0 );
+			else
+				delete_transient( dz_biblegateway_votd::transient_name );
 		}
 
 		/**
