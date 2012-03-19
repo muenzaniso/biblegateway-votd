@@ -237,18 +237,18 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 
 			switch ( $input['embed-method'] ) {
 				case 'basic':
-					$option['embed-method'] = 'basic';
+					$options['embed-method'] = 'basic';
 					$this->remove_cache();
 					break;
 
 				case 'jquery':
-					$option['embed-method'] = 'jquery';
+					$options['embed-method'] = 'jquery';
 					$this->remove_cache();
 					break;
 
 				case 'cache':
 				default:
-					$option['embed-method'] = 'cache';
+					$options['embed-method'] = 'cache';
 					set_transient( dz_biblegateway_votd::transient_name, $this->get_cache(), 0 );
 					break;
 			}
