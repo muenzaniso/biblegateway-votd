@@ -508,11 +508,6 @@ Clear Cache</label>
 
 			$filtered = array_map( 'wp_strip_all_tags', $json );
 
-			// Is this a new day?
-
-			if ( date( 'Ymd' ) != $filtered['year'] . $filtered['month'] . $filtered['day'] )
-				return false;
-
 			// Build the verse.
 
 			$verse = esc_html( $filtered['text'] ) . ' &#8212; ';
