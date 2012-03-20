@@ -651,7 +651,7 @@ Clear Cache</label>
 		 * @access public
 		 * @param mixed $old_settings
 		 * @param mixed $new_settings
-		 * @uses dz_biblegateway_votd::is_version_available
+		 * @uses dz_biblegateway_votd::is_version_available()
 		 * @uses get_option()
 		 * @uses update_option()
 		 * @return void
