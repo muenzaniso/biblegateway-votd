@@ -238,12 +238,12 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			switch ( $input['embed-method'] ) {
 				case 'basic':
 					$options['embed-method'] = 'basic';
-					$this->delete_cache();
+					$this->delete_cache( true );
 					break;
 
 				case 'jquery':
 					$options['embed-method'] = 'jquery';
-					$this->delete_cache();
+					$this->delete_cache( true );
 					break;
 
 				case 'cache':
@@ -629,14 +629,15 @@ Clear Cache</label>
 		 * the cache embed method, deletes the transient cache.
 		 *
 		 * @access public
+		 * @param bool $force (default: false)
 		 * @uses set_transient()
 		 * @uses delete_transient()
 		 * @return void
 		 */
-		public function delete_cache() {
+		public function delete_cache( $force = false ) {
 			$options = get_option( dz_biblegateway_votd::option_name );
 
-			if ( isset( $options['embed-method'] ) && 'cache' == $options['embed-method'] )
+			if ( !$force && isset( $options['embed-method'] ) && 'cache' == $options['embed-method'] )
 				set_transient( dz_biblegateway_votd::transient_name, array(), 0 );
 			else
 				delete_transient( dz_biblegateway_votd::transient_name );
