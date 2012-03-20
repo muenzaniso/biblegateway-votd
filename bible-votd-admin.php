@@ -215,7 +215,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 		 *
 		 * @access public
 		 * @uses self::default_plugin_options()
-		 * @uses self::remove_cache()
+		 * @uses self::delete_cache()
 		 * @uses add_settings_error()
 		 * @see update_option()
 		 * @param mixed $input
@@ -238,12 +238,12 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			switch ( $input['embed-method'] ) {
 				case 'basic':
 					$options['embed-method'] = 'basic';
-					$this->remove_cache();
+					$this->delete_cache();
 					break;
 
 				case 'jquery':
 					$options['embed-method'] = 'jquery';
-					$this->remove_cache();
+					$this->delete_cache();
 					break;
 
 				case 'cache':
@@ -289,7 +289,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 			// Clear the cache if selected.
 
 			if ( isset( $input['clear-cache'] ) ) {
-				$this->remove_cache();
+				$this->delete_cache();
 				add_settings_error( 'general', dz_biblegateway_votd::option_name . '_clear-cache', 'Cache cleared.', 'updated' );
 			}
 
@@ -587,7 +587,7 @@ Clear Cache</label>
 			if ( !empty( $cache ) )
 				set_transient( dz_biblegateway_votd::transient_name, $cache, 0 );
 			else
-				$this->remove_cache();
+				$this->delete_cache();
 		}
 
 		/**
@@ -623,7 +623,7 @@ Clear Cache</label>
 		}
 
 		/**
-		 * remove_cache function.
+		 * delete_cache function.
 		 *
 		 * If using the cache embed method, sets the transient cache to an empty array. If not using
 		 * the cache embed method, deletes the transient cache.
@@ -633,7 +633,7 @@ Clear Cache</label>
 		 * @uses delete_transient()
 		 * @return void
 		 */
-		public function remove_cache() {
+		public function delete_cache() {
 			$options = get_option( dz_biblegateway_votd::option_name );
 
 			if ( isset( $options['embed-method'] ) && 'cache' == $options['embed-method'] )
