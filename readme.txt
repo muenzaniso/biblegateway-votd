@@ -1,7 +1,7 @@
 === Plugin Name ===
 Contributors: Dave Zaikos
 Donate link: http://zaikos.com/donate/
-Tags: bible, biblegateway, verse of the day, votd, niv, kjv, esv
+Tags: bible, gateway, verse of the day, votd, biblegateway, niv, kjv, esv
 Requires at least: 3.3
 Tested up to: 3.3.1
 Stable tag: 3.0
