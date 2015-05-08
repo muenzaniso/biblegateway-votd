@@ -1,15 +1,15 @@
 <?php
 /*
 Plugin Name: BibleGateway VOTD
-Plugin URI: http://zaikos.com/biblegateway-votd/
+Plugin URI: https://wordpress.org/plugins/biblegateway-votd/
 Description: Insert <a href="http://www.biblegateway.com/usage/">BibleGateway.com</a>'s verse of the day in pages or posts. Use the Widgets page to add the verse to your sidebar or add <strong>[biblevotd]</strong> in pages or posts where you want to insert the verse.
-Version: 3.0
+Version: 3.1
 Author: Dave Zaikos
-Author URI: http://zaikos.com/
+Author URI: http://dave.zaikos.com/
 License: GPL2
 */
 
-/*  Copyright 2012  Dave Zaikos  (email : http://zaikos.com/contact/)
+/*  Copyright 2012-2015  Dave Zaikos  (email : http://dave.zaikos.com/contact-me/)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as
@@ -31,7 +31,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 	 *
 	 * Insert BibleGateway.com's verse-of-the-day in pages, posts, or as a widget.
 	 *
-	 * @version 3.0
+	 * @version 3.1
 	 * @author Dave Zaikos
 	 * @copyright Copyright (c) 2012, Dave Zaikos
 	 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
@@ -43,7 +43,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 *
 		 * Holds the current version of this plugin.
 		 */
-		const version = 3.0;
+		const version = 3.1;
 
 		/**
 		 * instances
@@ -190,7 +190,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 ?>
 <script type="text/javascript">
 /* <![CDATA[ */
-jQuery(document).ready(function(b){var a=<?php echo json_encode( $this->instances ); ?>;b.each(a,function(d,c){b.getJSON("http://www.biblegateway.com/votd/get?callback=?",{format:"json",version:c},function(f){if("undefined"!=typeof f.error){return true;}var e=f.votd;b("div#biblegateway-votd-"+d).html(e.text+' &#8212; <a href="'+e.permalink+'">'+e.reference+"</a>."+("undefined"!=typeof e.audiolink?' <a href="'+e.audiolink+'" title="Listen to chapter"><img width="13" height="12" src="http://www.biblegateway.com/resources/audio/images/sound.gif" alt="Listen to chapter" /></a>':"")+' <a href="'+e.copyrightlink+'">'+e.copyright.replace(/\.+$/,"")+'</a>. Powered by <a href="http://www.biblegateway.com/">BibleGateway.com</a>.');});});});
+jQuery(document).ready(function(b){var a=<?php echo json_encode( $this::$instances ); ?>;b.each(a,function(d,c){b.getJSON("http://www.biblegateway.com/votd/get?callback=?",{format:"json",version:c},function(f){if("undefined"!=typeof f.error){return true;}var e=f.votd;b("div#biblegateway-votd-"+d).html(e.text+' &#8212; <a href="'+e.permalink+'">'+e.reference+"</a>."+("undefined"!=typeof e.audiolink?' <a href="'+e.audiolink+'" title="Listen to chapter"><img width="13" height="12" src="http://www.biblegateway.com/resources/audio/images/sound.gif" alt="Listen to chapter" /></a>':"")+' <a href="'+e.copyrightlink+'">'+e.copyright.replace(/\.+$/,"")+'</a>. Powered by <a href="http://www.biblegateway.com/">BibleGateway.com</a>.');});});});
 /* ]]> */
 </script>
 <?php
@@ -207,8 +207,8 @@ jQuery(document).ready(function(b){var a=<?php echo json_encode( $this->instance
 		private function get_cached_html_code() {
 			$cache = get_transient( self::transient_name );
 
-			end( $this->instances );
-			$version = current( $this->instances );
+			end( $this::$instances );
+			$version = current( $this::$instances );
 
 			if ( isset( $cache[$version]['verse'] ) )
 				return $cache[$version]['verse'];
@@ -302,13 +302,13 @@ jQuery(document).ready(function(b){var a=<?php echo json_encode( $this->instance
 
 			// Get and update instance.
 
-			$this->instances[] = $version;
-			end( $this->instances );
-			$instance = key( $this->instances );
+			$this::$instances[] = $version;
+			end( $this::$instances );
+			$instance = key( $this::$instances );
 
 			// Build the code.
 
-			$votd = "\n<!-- BibleGateway.com Verse of the Day plugin by Dave Zaikos (http://zaikos.com/biblegateway-votd/). -->\n"; /* Luke 6:31. Please do not remove the credit. Thank you! */
+			$votd = "\n<!-- BibleGateway.com Verse of the Day plugin by Dave Zaikos (http://dave.zaikos.com/). -->\n"; /* Luke 6:31. Please do not remove the credit. Thank you! */
 			$votd .= "<div id='dz-biblevotd-%3\$d' class='%2\$s'>\n";
 			$votd .= "\t" . $this->bible_votd_code_helper() . "\n";
 			$votd .= "</div>\n";

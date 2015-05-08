@@ -1,10 +1,10 @@
 === Plugin Name ===
 Contributors: Dave Zaikos
-Donate link: http://zaikos.com/donate/
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UUKC8GMRJUJTS
 Tags: bible, gateway, verse of the day, votd, biblegateway, niv, kjv, esv
 Requires at least: 3.3
-Tested up to: 3.3.1
-Stable tag: 3.0
+Tested up to: 4.2.2
+Stable tag: 3.1
 
 Adds BibleGateway.com's verse of the day as a sidebar widget, or on a page or post.
 
@@ -84,6 +84,11 @@ The Basic method should only be used if Cache and jQuery are not working. It use
 3. A sample of the verse of the day being used in a shortcode on a page with the Twenty Eleven theme.
 
 == Changelog ==
+
+= 3.1 =
+
+* Fixed some PHP strict errors.
+* Minor tweaks to some reference URLs.
 
 = 3.0 =
 

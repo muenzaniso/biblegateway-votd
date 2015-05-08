@@ -5,9 +5,9 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 	 *
 	 * Handles the administrative options for the dz_biblegateway_votd class.
 	 *
-	 * @version 3.0
+	 * @version 3.1
 	 * @author Dave Zaikos
-	 * @copyright Copyright (c) 2012, Dave Zaikos
+	 * @copyright Copyright (c) 2012-2015, Dave Zaikos
 	 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
 	 */
 	class dz_biblegateway_votd_admin {
@@ -190,8 +190,8 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 <?php screen_icon(); ?>
 	<h2>Bible Verse of the Day Settings</h2>
 
-	<p>The BibleGateway.com plugin is independently written and maintained by <a href="http://zaikos.com/">Dave Zaikos</a> and in no way affiliated with BibleGateway.com.</p>
-	<p>If you use this plugin, please consider <a href="http://zaikos.com/donate/">making a donation</a> to support its continued development. Donations from users such as yourself help ensure this software&#8217;s future.</p>
+	<p>The BibleGateway.com plugin is independently written and maintained by <a href="http://dave.zaikos.com/">Dave Zaikos</a> and in no way affiliated with BibleGateway.com.</p>
+	<p>If you use this plugin, please consider <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UUKC8GMRJUJTS" target="_blank">making a donation</a> to support its continued development. Donations from users such as yourself help ensure this software&#8217;s future.</p>
 
 	<h3>Usage</h3>
 
