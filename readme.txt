@@ -87,6 +87,7 @@ The Basic method should only be used if Cache and jQuery are not working. It use
 
 = 3.1 =
 
+* Updated available English translations.
 * Fixed some PHP strict errors.
 * Minor tweaks to some reference URLs.
 
