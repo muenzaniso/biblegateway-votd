@@ -121,9 +121,9 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 					delete_option( 'biblegateway_votd' );
 				}
 
-				// Version 3.2.
+				// Version 3.3.
 
-				$new['version'] = 3.2;
+				$new['version'] = 3.3;
 
 				update_option( dz_biblegateway_votd::option_name, $new );
 			}

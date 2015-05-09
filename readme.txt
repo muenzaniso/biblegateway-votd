@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: bible, gateway, verse of the day, votd, biblegateway, niv, kjv, esv
 Requires at least: 3.3
 Tested up to: 4.2.2
-Stable tag: 3.2
+Stable tag: 3.3
 
 Adds BibleGateway.com's verse of the day as a sidebar widget, or on a page or post.
 
