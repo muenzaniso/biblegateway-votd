@@ -9,7 +9,7 @@ Author URI: http://dave.zaikos.com/
 License: GPL2
 */
 
-/*  Copyright 2012-2015  Dave Zaikos  (email : http://dave.zaikos.com/contact-me/)
+/*  Copyright 2008-2015  Dave Zaikos  (email : http://dave.zaikos.com/contact-me/)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as
@@ -33,7 +33,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 	 *
 	 * @version 3.1
 	 * @author Dave Zaikos
-	 * @copyright Copyright (c) 2012, Dave Zaikos
+	 * @copyright Copyright (c) 2008-2015, Dave Zaikos
 	 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
 	 */
 	class dz_biblegateway_votd {
