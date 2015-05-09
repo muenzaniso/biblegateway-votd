@@ -121,6 +121,10 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 					delete_option( 'biblegateway_votd' );
 				}
 
+				// Version 3.2.
+
+				$new['version'] = 3.2;
+
 				update_option( dz_biblegateway_votd::option_name, $new );
 			}
 		}
@@ -514,7 +518,7 @@ Clear Cache</label>
 			$verse .= '<a href="' . esc_url( $filtered['permalink'], array( 'http', 'https' ) ) . '">';
 			$verse .= esc_html( $filtered['reference'] ) . '</a>';
 
-			if ( isset( $filtered['audiolink'] ) ) {
+			if ( !empty( $filtered['audiolink'] ) ) {
 				$verse .= ' <a href="' . esc_url( $filtered['audiolink'], array( 'http', 'https' ) ) . '" title="Listen to chapter">';
 				$verse .= '<img width="13" height="12" src="http://www.biblegateway.com/resources/audio/images/sound.gif" alt="Listen to chapter" /></a>';
 			}

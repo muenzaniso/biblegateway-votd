@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: bible, gateway, verse of the day, votd, biblegateway, niv, kjv, esv
 Requires at least: 3.3
 Tested up to: 4.2.2
-Stable tag: 3.1
+Stable tag: 3.2
 
 Adds BibleGateway.com's verse of the day as a sidebar widget, or on a page or post.
 
@@ -32,26 +32,58 @@ You can insert multiple verses of the day (in different translations) across you
 
 = What translations are for supported when including the verse? =
 
-* ASV = American Standard Version
-* AMP = Amplified Bible
-* CEB = Common English Bible
-* DARBY = Darby Translation
-* ESV = English Standard Version
-* ESVUK = English Standard Version Anglicised
-* GW = GOD'S WORD Translation
-* HCSB = Holman Christian Standard Bible
-* PHILLIPS = J.B. Phillips New Testament
-* KJV = King James Version
-* LEB = Lexham English Bible
-* NASB = New American Standard Bible
-* NIRV = New International Reader's Version
-* NIV = New International Version
-* NIVUK = New International Version - UK
-* NLV = New Life Version
-* TNIV = Today's New International Version
-* WE = Worldwide English (New Testament)
-* WYC = Wycliffe Bible
-* YLT = Young's Literal Translation
+* 1599 Geneva Bible (GNV)
+* 21st Century King James Version (KJ21)
+* American Standard Version (ASV)
+* Amplified Bible (AMP)
+* Authorized (King James) Version (AKJV)
+* BRG Bible (BRG)
+* Common English Bible (CEB)
+* Complete Jewish Bible (CJB)
+* Contemporary English Version (CEV)
+* Darby Translation (DARBY)
+* Disciples' Literal New Testament (DLNT)
+* Douay-Rheims 1899 American Edition (DRA)
+* Easy-to-Read Version (ERV)
+* English Standard Version (ESV)
+* English Standard Version Anglicised (ESVUK)
+* Expanded Bible (EXB)
+* GOD'S WORD Translation (GW)
+* Good News Translation (GNT)
+* Holman Christian Standard Bible (HCSB)
+* International Children's Bible (ICB)
+* International Standard Version (ISV)
+* J.B. Phillips New Testament (PHILLIPS)
+* Jubilee Bible 2000 (JUB)
+* King James Version (KJV)
+* Lexham English Bible (LEB)
+* Living Bible (TLB)
+* Modern English Version (MEV)
+* Mounce Reverse-Interlinear New Testament (MOUNCE)
+* Names of God Bible (NOG)
+* New American Bible (Revised Edition) (NABRE)
+* New American Standard Bible (NASB)
+* New Century Version (NCV)
+* New English Translation (NET Bible)
+* New International Reader's Version (NIRV)
+* New International Version (NIV)
+* New International Version - UK (NIVUK)
+* New King James Version (NKJV)
+* New Life Version (NLV)
+* New Living Translation (NLT)
+* New Revised Standard Version (NRSV)
+* New Revised Standard Version Catholic Edition (NRSVCE)
+* New Revised Standard Version, Anglicised (NRSVA)
+* New Revised Standard Version, Anglicised Catholic Edition (NRSVACE)
+* Orthodox Jewish Bible (OJB)
+* Revised Standard Version (RSV)
+* Revised Standard Version Catholic Edition (RSVCE)
+* The Message (MSG)
+* The Voice (VOICE)
+* World English Bible (WEB)
+* Worldwide English (New Testament) (WE)
+* Wycliffe Bible (WYC)
+* Young's Literal Translation (YLT)
 
 = What if I want a translation not listed above? =
 
@@ -84,6 +116,11 @@ The Basic method should only be used if Cache and jQuery are not working. It use
 3. A sample of the verse of the day being used in a shortcode on a page with the Twenty Eleven theme.
 
 == Changelog ==
+
+= 3.2 =
+
+* Fixed an error that caused the audio/speaker link to appear even if playback was not available for the chosen translation.
+* Updated translations list in FAQs.
 
 = 3.1 =
 
