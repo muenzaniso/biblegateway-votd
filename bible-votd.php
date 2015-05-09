@@ -3,7 +3,7 @@
 Plugin Name: BibleGateway VOTD
 Plugin URI: https://wordpress.org/plugins/biblegateway-votd/
 Description: Insert <a href="http://www.biblegateway.com/usage/">BibleGateway.com</a>'s verse of the day in pages or posts. Use the Widgets page to add the verse to your sidebar or add <strong>[biblevotd]</strong> in pages or posts where you want to insert the verse.
-Version: 3.1
+Version: 3.2
 Author: Dave Zaikos
 Author URI: http://dave.zaikos.com/
 License: GPL2
@@ -43,7 +43,7 @@ if ( !class_exists( 'dz_biblegateway_votd' ) ) {
 		 *
 		 * Holds the current version of this plugin.
 		 */
-		const version = 3.1;
+		const version = 3.2;
 
 		/**
 		 * instances
