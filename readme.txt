@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: bible, gateway, verse of the day, votd, biblegateway, niv, kjv, esv
 Requires at least: 3.3
 Tested up to: 4.2.2
-Stable tag: 3.3
+Stable tag: 3.4
 
 Adds BibleGateway.com's verse of the day as a sidebar widget, or on a page or post.
 
@@ -116,6 +116,10 @@ The Basic method should only be used if Cache and jQuery are not working. It use
 3. A sample of the verse of the day being used in a shortcode on a page with the Twenty Eleven theme.
 
 == Changelog ==
+
+= 3.4 =
+
+* Worked around possible T_PAAMAYIM_NEKUDOTAYIM PHP fatal error.
 
 = 3.3 =
 

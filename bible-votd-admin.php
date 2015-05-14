@@ -5,7 +5,7 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 	 *
 	 * Handles the administrative options for the dz_biblegateway_votd class.
 	 *
-	 * @version 3.1
+	 * @version 3.4
 	 * @author Dave Zaikos
 	 * @copyright Copyright (c) 2008-2015, Dave Zaikos
 	 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
@@ -121,9 +121,9 @@ if ( !class_exists( 'dz_biblegateway_votd_admin' ) ) {
 					delete_option( 'biblegateway_votd' );
 				}
 
-				// Version 3.3.
+				// Version 3.4.
 
-				$new['version'] = 3.3;
+				$new['version'] = 3.4;
 
 				update_option( dz_biblegateway_votd::option_name, $new );
 			}
