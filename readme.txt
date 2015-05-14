@@ -117,6 +117,10 @@ The Basic method should only be used if Cache and jQuery are not working. It use
 
 == Changelog ==
 
+= 3.3 =
+
+* Fixed an error that caused the audio/speaker link to appear even if playback was not available for the chosen translation. (Previously only fixed this when using the Cache method, now also fixed when using jQuery.)
+
 = 3.2 =
 
 * Fixed an error that caused the audio/speaker link to appear even if playback was not available for the chosen translation.
